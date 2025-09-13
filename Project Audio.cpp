@@ -120,26 +120,19 @@ void cmnd_stoppause(ma_decoder &decoder, ma_device &device, std::string cmd) {
 }
 
 // this some chatgpt voodoo
-bool isValidSyntax(std::string& s) {
+bool isValidSyntax(std::string &s) {
     std::regex pattern("^\\d{2}:\\d{2}$");
     return std::regex_match(s, pattern);
 }
 
 void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength) {
-    // This is one way of doing it. The reason for the glitch is that decoders are not thread safe. 
-    // So you'll end up in a situation where the device is reading from the decoder in it's data callback which is running on its own thread, 
-    // and then in another thread you are seeking.
-    // Another way you could do it is to do your reading and seeking all inside the same thread, i.e.the device's data callback. 
-    // Alternatively you could use a mutex.
-    // -dev of miniaudio
-
     if (!isValidSyntax(strLength)) {
         std::cout << "Invalid syntax\n";
         return;
     }
 
     if (!playing) {
-        std::cout << "Can't seek air, buddy\n";
+        std::cout << "Nothing is currently playing\n";
         return;
     }
 
@@ -159,6 +152,12 @@ void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength) {
     ma_device_stop(&device);
     ma_decoder_seek_to_pcm_frame(&decoder, seekFrame);
     ma_device_start(&device);
+    // This is one way of doing it. The reason for the glitch is that decoders are not thread safe. 
+    // So you'll end up in a situation where the device is reading from the decoder in it's data callback which is running on its own thread, 
+    // and then in another thread you are seeking.
+    // Another way you could do it is to do your reading and seeking all inside the same thread, i.e.the device's data callback. 
+    // Alternatively you could use a mutex.
+    // ^ from https://www.reddit.com/r/miniaudio/comments/1i253qu/how_can_i_seeking_a_single_audio_file_intilized/
 }
 
 int main() {
@@ -207,11 +206,6 @@ int main() {
             std::cout << "Unknown command. Type 'help' for available commands";
         }
     }
-
-    if (playing) {
-        ma_device_uninit(&device);
-    }
-    ma_decoder_uninit(&decoder);
     std::cout << "Exiting... ";
 
     return 0;
