@@ -2,11 +2,12 @@
 // or project specific include files.
 
 #pragma once
-
 #include "miniaudio.c"
 
+#include <stdio.h>
+
 #include <iostream>
+#include <mutex>
+#include <regex>
 #include <string>
 #include <sstream>
-#include <regex>
-#include <stdio.h>
