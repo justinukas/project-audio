@@ -5,6 +5,7 @@
 
 volatile bool playing = false;
 bool deviceInitialized = false;
+float factor = 0.5f; // volume setting
 
 // this is confusing too. i think its for decoding the audio
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
@@ -25,6 +26,16 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     if (framesRead < frameCount) {
         playing = false;
         std::cout << "End of playback.\n";
+    }
+
+    // some voodoo shit for volume control from this github issue
+    // https://github.com/mackron/miniaudio/issues/26#issuecomment-406415191
+    for (size_t i = 0; i < framesRead; i++) {
+        float* samples = (float*)pOutput;
+        ma_uint32 channelCount = pDecoder->outputChannels;
+        for (size_t c = 0; c < channelCount; c++) {
+            samples[i * pDecoder->outputChannels + c] *= factor;
+        }
     }
         
     (void)pInput; // unused
@@ -120,13 +131,13 @@ void cmnd_stoppause(ma_decoder &decoder, ma_device &device, std::string cmd) {
 }
 
 // this some chatgpt voodoo
-bool isValidSyntax(std::string &s) {
+bool validSeekSyntax(std::string &s) {
     std::regex pattern("^\\d{2}:\\d{2}$");
     return std::regex_match(s, pattern);
 }
 
 void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength) {
-    if (!isValidSyntax(strLength)) {
+    if (!validSeekSyntax(strLength)) {
         std::cout << "Invalid syntax\n";
         return;
     }
@@ -158,6 +169,35 @@ void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength) {
     // Another way you could do it is to do your reading and seeking all inside the same thread, i.e.the device's data callback. 
     // Alternatively you could use a mutex.
     // ^ from https://www.reddit.com/r/miniaudio/comments/1i253qu/how_can_i_seeking_a_single_audio_file_intilized/
+}
+
+bool containsLetters(std::string s) {
+    bool contains = false;
+    for (int i = 0; i < s.length(); i++) {
+        if (isdigit(s[i]) == false) {
+            contains = true;
+            break;
+        }
+    }
+    return contains;
+}
+
+void cmnd_volume(ma_decoder& decoder, ma_device& device, std::string strVolume) {
+    float volume;
+
+    if (containsLetters(strVolume)) {
+        std::cout << "Please input a number from 0-100\n";
+        return;
+    }
+
+    volume = stof(strVolume);
+
+    if (volume > 100 || volume < 0) {
+        std::cout << "Please input a number from 0-100\n";
+        return;
+    }
+
+    factor = volume/100.0f;
 }
 
 int main() {
@@ -194,13 +234,17 @@ int main() {
             std::getline(ss, parameter);
             cmnd_seek(decoder, device, parameter);
         }
+        else if (cmd == "volume") {
+            std::getline(ss, parameter);
+            cmnd_volume(decoder, device, parameter);
+        }
         else if (cmd == "exit") {
             exitLoop = true;
         }
 
         // debug commands
         else if (cmd == "isplaying") {
-            std::cout << (playing ? "true" : "false") << "\n";
+            std::cout << std::boolalpha << playing << "\n";
         } 
         else {
             std::cout << "Unknown command. Type 'help' for available commands";
