@@ -4,18 +4,13 @@
 #include "miniaudio.h"
 
 volatile bool playing = false;
-bool deviceInitialized = false;
+bool deviceOn = false;
 float factor = 0.5f; // volume setting
 
 // this is confusing too. i think its for decoding the audio
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
     ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
-    if (pDecoder == NULL) {
-        return;
-    }
-
-    if (playing == false) {
-        memset(pOutput, 0, frameCount * ma_get_bytes_per_frame(pDevice->playback.format, pDevice->playback.channels));
+    if (pDecoder == NULL || !playing) {
         return;
     }
 
@@ -66,7 +61,7 @@ void cmnd_load(std::string &strAudioPath, ma_result &result, ma_decoder &decoder
 
     if (playing) {
         playing = false;
-        if (deviceInitialized) ma_device_uninit(&device);
+        if (deviceOn) ma_device_stop(&device);
     }
 
     result = ma_decoder_init_file(audioPath, NULL, &decoder);
@@ -107,7 +102,7 @@ void cmnd_play(ma_result &result, ma_decoder &decoder, ma_device_config &deviceC
         return;
     }
 
-    deviceInitialized = true;
+    deviceOn = true;
     playing = true;
     std::cout << "Playing... \n";
 }
@@ -119,7 +114,7 @@ void cmnd_stoppause(ma_decoder &decoder, ma_device &device, std::string cmd) {
     }
 
     playing = false;
-    if (deviceInitialized) ma_device_uninit(&device);
+    if (deviceOn) ma_device_stop(&device);
 
     if (cmd == "stop") {
         ma_decoder_seek_to_pcm_frame(&decoder, 0);
@@ -185,7 +180,7 @@ bool containsLetters(std::string s) {
 void cmnd_volume(ma_decoder& decoder, ma_device& device, std::string strVolume) {
     float volume;
 
-    if (containsLetters(strVolume)) {
+    if (containsLetters(strVolume) || strVolume == "") {
         std::cout << "Please input a number from 0-100\n";
         return;
     }
