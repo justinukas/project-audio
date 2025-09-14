@@ -46,7 +46,10 @@ void cmnd_help() {
         << "stop                   -stop playback\n"
         << "pause                  -pause playback\n"
         << "seek                   -seek to a specific timestamp. Syntax: mm:ss\n"
-        << "exit                   -exit program\n";
+        << "volume                 -set volume from 0-100\n"
+        << "exit                   -exit program\n"
+        << "DEBUG COMMANDS:\n"
+        << "isplaying              -check if audio is playing\n";
 }
 
 void cmnd_load(std::string &strAudioPath, ma_result &result, ma_decoder &decoder, ma_device_config &deviceConfig, ma_device &device) {
