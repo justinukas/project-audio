@@ -12,7 +12,7 @@ endif()
 project ("Project Audio")
 
 # Add source to this project's executable.
-add_executable (CMakeTarget "Project Audio.cpp" "Project Audio.h")
+add_executable (CMakeTarget "main.cpp" "include/main.h" "commands.cpp" "include/commands.h" "utilities.cpp" "include/utilities.h" "miniaudio.c" )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET CMakeTarget PROPERTY CXX_STANDARD 20)
