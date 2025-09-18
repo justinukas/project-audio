@@ -62,3 +62,19 @@ bool validateVolumeInput(std::string& inputVolume, float& outVolume) {
         return false;
     }
 }
+
+void getTime(ma_decoder& decoder, int& seconds, int& minutes, std::string type) {
+    std::lock_guard<std::mutex> lock(audioMutex);
+
+    ma_uint64 frames;
+    if (type == "elapsed") {
+        ma_decoder_get_cursor_in_pcm_frames(&decoder, &frames);
+    }
+    else if (type == "length") {
+        ma_decoder_get_length_in_pcm_frames(&decoder, &frames);
+    }
+    
+    seconds = static_cast<int>(frames) / decoder.outputSampleRate;
+    minutes = seconds / 60;
+    seconds -= minutes * 60;
+}

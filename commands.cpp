@@ -74,6 +74,10 @@ void cmnd_play(ma_result& result, ma_decoder& decoder, ma_device_config& deviceC
 
     isPlaying = true;
     std::cout << "Playing... \n";
+
+    int seconds, minutes;
+    getTime(decoder, seconds, minutes, "length");
+    std::cout << "Song length: [" << std::setfill('0') << std::setw(2) << minutes << ':' << std::setfill('0') << std::setw(2) << seconds << ']' << '\n';
 }
 
 void cmnd_stoppause(ma_decoder& decoder, ma_device& device, std::string cmd) {
@@ -133,15 +137,9 @@ void cmnd_elapsedTime(ma_decoder& decoder) {
     if (!isPlaying) {
         return;
     }
-    std::lock_guard<std::mutex> lock(audioMutex);
-
-    ma_uint64 currentFrame;
-    ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
-
+    
     int seconds, minutes;
-    seconds = static_cast<int>(currentFrame) / decoder.outputSampleRate;
-    minutes = seconds / 60;
-    seconds -= minutes * 60;
+    getTime(decoder, seconds, minutes, "elapsed");
 
     std::cout << '[' << std::setfill('0') << std::setw(2) << minutes << ':' << std::setfill('0') << std::setw(2) << seconds << ']' << '\n';
 }

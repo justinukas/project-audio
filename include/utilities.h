@@ -11,3 +11,4 @@ void configureDevice(ma_decoder& decoder, ma_device_config& deviceConfig);
 void deviceCleanup(ma_decoder& decoder, ma_device& device);
 void seekToFrame(ma_decoder& decoder, ma_uint64 frame);
 bool validateVolumeInput(std::string& input, float& outVolume);
+void getTime(ma_decoder& decoder, int& seconds, int& minutes, std::string timeType);
