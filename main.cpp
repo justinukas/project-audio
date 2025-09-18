@@ -3,7 +3,7 @@
 #include "include/utilities.h"
 #include "include/commands.h"
 
-extern bool playing;
+extern bool isPlaying;
 
 int main() {
     ma_result result;
@@ -22,21 +22,22 @@ int main() {
         std::getline(ss, cmd, ' ');
         std::getline(ss, parameter);
 
-        if (cmd == "help")cmnd_help();
+        if (cmd == "help") cmnd_help();
         else if (cmd == "load") cmnd_load(parameter, result, decoder, deviceConfig, device);
         else if (cmd == "play") cmnd_play(result, decoder, deviceConfig, device);
         else if (cmd == "stop" || cmd == "pause") cmnd_stoppause(decoder, device, cmd);
         else if (cmd == "seek") cmnd_seek(decoder, device, parameter);
         else if (cmd == "volume") cmnd_volume(decoder, device, parameter);
+        else if (cmd == "time") cmnd_elapsedTime(decoder);
         else if (cmd == "exit") break;
-        else if (cmd == "isplaying") std::cout << std::boolalpha << playing << "\n";
+        else if (cmd == "isplaying") std::cout << std::boolalpha << isPlaying << "\n";
         else std::cout << "Unknown command. Type 'help' for available commands\n";
     }
     std::cout << "Exiting... ";
 
-    if (playing) {
+    if (isPlaying) {
         ma_device_stop(&device);
-        playing = false;
+        isPlaying = false;
     }
     deviceCleanup(decoder, device);
 

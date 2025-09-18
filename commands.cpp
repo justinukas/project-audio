@@ -1,8 +1,9 @@
 // commands.cpp
 #include "include/commands.h"
 
-extern bool playing;
-extern float factor;
+extern bool isPlaying;
+extern float volumeMultiplier;
+extern std::mutex audioMutex;
 
 void cmnd_help() {
     std::cout
@@ -15,14 +16,15 @@ void cmnd_help() {
         << "pause                  -pause playback\n"
         << "seek                   -seek to a specific timestamp. Syntax: mm:ss\n"
         << "volume                 -set volume from 0-100\n"
+        << "time                   -get how much of the song has elapsed"
         << "exit                   -exit program\n"
         << "\nDEBUG COMMANDS:\n"
         << "isplaying              -check if audio is playing\n";
 }
 
 void cmnd_load(std::string& strAudioPath, ma_result& result, ma_decoder& decoder, ma_device_config& deviceConfig, ma_device& device) {
-    if (playing) {
-        playing = false;
+    if (isPlaying) {
+        isPlaying = false;
         deviceCleanup(decoder, device);
     }
 
@@ -48,7 +50,7 @@ void cmnd_load(std::string& strAudioPath, ma_result& result, ma_decoder& decoder
 
 void cmnd_play(ma_result& result, ma_decoder& decoder, ma_device_config& deviceConfig, ma_device& device) {
     // seek to beginning
-    if (playing) {
+    if (isPlaying) {
         seekToFrame(decoder, 0);
         return;
     }
@@ -70,14 +72,14 @@ void cmnd_play(ma_result& result, ma_decoder& decoder, ma_device_config& deviceC
         return;
     }
 
-    playing = true;
+    isPlaying = true;
     std::cout << "Playing... \n";
 }
 
 void cmnd_stoppause(ma_decoder& decoder, ma_device& device, std::string cmd) {
-    if (playing) {
+    if (isPlaying) {
         ma_device_stop(&device);
-        playing = false;
+        isPlaying = false;
     }
 
     if (cmd == "stop") {
@@ -90,7 +92,7 @@ void cmnd_stoppause(ma_decoder& decoder, ma_device& device, std::string cmd) {
 }
 
 void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength) {
-    if (!playing) {
+    if (!isPlaying) {
         std::cout << "Nothing is currently playing\n";
         return;
     }
@@ -100,15 +102,15 @@ void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength) {
         return;
     }
 
-    int seconds, minutes, length;
+    int seconds, minutes, totalLengthSeconds;
     char colon;
 
     std::istringstream ss(strLength);
     ss >> minutes >> colon >> seconds;
 
-    length = minutes * 60 + seconds;
+    totalLengthSeconds = minutes * 60 + seconds;
 
-    ma_uint64 seekFrame = static_cast<ma_uint64>(length) * decoder.outputSampleRate;;
+    ma_uint64 seekFrame = static_cast<ma_uint64>(totalLengthSeconds) * decoder.outputSampleRate;;
 
     seekToFrame(decoder, seekFrame);
     // The decoders are not thread safe, so if you read while there is an active data callback which is running on its own thread
@@ -118,11 +120,28 @@ void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength) {
     // ^ from https://www.reddit.com/r/miniaudio/comments/1i253qu/how_can_i_seeking_a_single_audio_file_intilized/
 }
 
-void cmnd_volume(ma_decoder& decoder, ma_device& device, std::string strVolume) {
+void cmnd_volume(ma_decoder& decoder, ma_device& device, std::string inputVolume) {
     float newVolume;
-    if (!validateVolumeInput(strVolume, newVolume)) {
+    if (!validateVolumeInput(inputVolume, newVolume)) {
         std::cout << "Please input a number from 0-100\n";
         return;
     }
-    factor = newVolume;
+    volumeMultiplier = newVolume;
+}
+
+void cmnd_elapsedTime(ma_decoder& decoder) {
+    if (!isPlaying) {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(audioMutex);
+
+    ma_uint64 currentFrame;
+    ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+
+    int seconds, minutes;
+    seconds = static_cast<int>(currentFrame) / decoder.outputSampleRate;
+    minutes = seconds / 60;
+    seconds -= minutes * 60;
+
+    std::cout << '[' << std::setfill('0') << std::setw(2) << minutes << ':' << std::setfill('0') << std::setw(2) << seconds << ']' << '\n';
 }

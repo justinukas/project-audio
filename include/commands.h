@@ -6,6 +6,7 @@
 #include "utilities.h"
 #include <string>
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <regex>
 #include <sstream>
@@ -16,3 +17,4 @@ void cmnd_play(ma_result& result, ma_decoder& decoder, ma_device_config& deviceC
 void cmnd_stoppause(ma_decoder& decoder, ma_device& device, std::string cmd);
 void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength);
 void cmnd_volume(ma_decoder& decoder, ma_device& device, std::string strVolume);
+void cmnd_elapsedTime(ma_decoder& decoder);
