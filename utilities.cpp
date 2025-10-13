@@ -23,7 +23,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     float* samples = static_cast<float*>(pOutput);
     ma_uint32 channelCount = pDecoder->outputChannels;
     ma_uint64 totalSamples = audioFramesRead * channelCount;
-    for (size_t i = 0; i < totalSamples; i++) {
+    for (size_t i = 0; i < totalSamples; i+=2) {
         samples[i] *= volumeMultiplier;
     }
 }
@@ -38,9 +38,13 @@ void configureDevice(ma_decoder& decoder, ma_device_config& deviceConfig) {
     deviceConfig.pUserData = &decoder;
 }
 
-void deviceCleanup(ma_decoder& decoder, ma_device& device) {
-    ma_device_uninit(&device);
-    ma_decoder_uninit(&decoder);
+void deviceCleanup(ma_decoder& decoder, ma_device& device, bool decoderInitialized) {
+    if (ma_device_is_started(&device)) {
+        ma_device_uninit(&device);
+    }
+    if (decoderInitialized) {
+        ma_decoder_uninit(&decoder);
+    }
 }
 
 void seekToFrame(ma_decoder& decoder, ma_uint64 frame) {
@@ -66,7 +70,7 @@ bool validateVolumeInput(std::string& inputVolume, float& outVolume) {
 void getTime(ma_decoder& decoder, int& seconds, int& minutes, std::string type) {
     std::lock_guard<std::mutex> lock(audioMutex);
 
-    ma_uint64 frames;
+    ma_uint64 frames = 0;
     if (type == "elapsed") {
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &frames);
     }

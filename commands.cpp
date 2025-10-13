@@ -22,10 +22,10 @@ void cmnd_help() {
         << "isplaying              -check if audio is playing\n";
 }
 
-void cmnd_load(std::string& strAudioPath, ma_result& result, ma_decoder& decoder, ma_device_config& deviceConfig, ma_device& device) {
+void cmnd_load(std::string& strAudioPath, ma_result& result, ma_decoder& decoder, ma_device_config& deviceConfig, ma_device& device, bool& decoderInitialized) {
     if (isPlaying) {
         isPlaying = false;
-        deviceCleanup(decoder, device);
+        deviceCleanup(decoder, device, decoderInitialized);
     }
 
     if (strAudioPath.empty()) {
@@ -38,6 +38,8 @@ void cmnd_load(std::string& strAudioPath, ma_result& result, ma_decoder& decoder
     const char* audioPath = strAudioPath.c_str();
 
     result = ma_decoder_init_file(audioPath, NULL, &decoder);
+    decoderInitialized = (result == MA_SUCCESS);
+
     if (result != MA_SUCCESS) {
         std::cout << "Could not load file: " << audioPath << "\n";
         return;
@@ -48,7 +50,7 @@ void cmnd_load(std::string& strAudioPath, ma_result& result, ma_decoder& decoder
     std::cout << "File " << audioPath << " loaded successfuly!\n";
 }
 
-void cmnd_play(ma_result& result, ma_decoder& decoder, ma_device_config& deviceConfig, ma_device& device) {
+void cmnd_play(ma_result& result, ma_decoder& decoder, ma_device_config& deviceConfig, ma_device& device, bool decoderInitialized) {
     // seek to beginning
     if (isPlaying) {
         seekToFrame(decoder, 0);
@@ -68,7 +70,7 @@ void cmnd_play(ma_result& result, ma_decoder& decoder, ma_device_config& deviceC
     }
     if (ma_device_start(&device) != MA_SUCCESS) {
         std::cout << "Failed to start playback device\n";
-        deviceCleanup(decoder, device);
+        deviceCleanup(decoder, device, decoderInitialized);
         return;
     }
 
@@ -117,11 +119,6 @@ void cmnd_seek(ma_decoder& decoder, ma_device& device, std::string strLength) {
     ma_uint64 seekFrame = static_cast<ma_uint64>(totalLengthSeconds) * decoder.outputSampleRate;;
 
     seekToFrame(decoder, seekFrame);
-    // The decoders are not thread safe, so if you read while there is an active data callback which is running on its own thread
-    // the audio bugs out because it moves threads.
-    // Another way to implement this is to read and seek all inside the same thread, i.e.the data callback. 
-    // Alternatively I can use a mutex (?).
-    // ^ from https://www.reddit.com/r/miniaudio/comments/1i253qu/how_can_i_seeking_a_single_audio_file_intilized/
 }
 
 void cmnd_volume(ma_decoder& decoder, ma_device& device, std::string inputVolume) {
@@ -142,4 +139,14 @@ void cmnd_elapsedTime(ma_decoder& decoder) {
     getTime(decoder, seconds, minutes, "elapsed");
 
     std::cout << '[' << std::setfill('0') << std::setw(2) << minutes << ':' << std::setfill('0') << std::setw(2) << seconds << ']' << '\n';
+}
+
+void cmnd_readDirectory(std::string& directory) {
+    std::cout << directory;
+    for (const auto & entry : std::filesystem::directory_iterator(directory)) {
+        auto extension = entry.path().extension();
+        if (extension == ".mp3" || extension == ".wav" || extension == ".flac") {
+            std::cout << entry.path() << std::endl;
+        }
+    }
 }
