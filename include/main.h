@@ -3,8 +3,16 @@
 
 #pragma once
 #include "miniaudio.h"
-#include <stdio.h>
 
-#include <iostream>
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <mutex>
+#include <stdio.h>
 #include <sstream>
+
+#include <filesystem>
+#include <algorithm>
+#include <iomanip>
+#include <regex>
+#include <vector>
