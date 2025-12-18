@@ -1,7 +1,7 @@
 ﻿// main.h : Include file for standard system include files,
 // or project specific include files.
 
-#pragma once
+//#pragma once
 #include "miniaudio.h"
 
 #include <string>
@@ -16,3 +16,6 @@
 #include <iomanip>
 #include <regex>
 #include <vector>
+
+#include <thread>
+#include <chrono>
