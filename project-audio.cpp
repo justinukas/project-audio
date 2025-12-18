@@ -2,12 +2,25 @@
 
 std::mutex audioMutex;          // use this when reading frames outside of data callback in any way (stuff like seeking)
 bool soundIsPlaying = false;
+float volumeMultiplier = 0.5;
 
 void checkEndOfPlayback(ma_uint64 framesRead, ma_uint32 frameCount) {
     //soundIsPlaying = framesRead < frameCount;   <-- can write it like this instead later if i want
     if (framesRead < frameCount) {
         soundIsPlaying = false;
         std::cout << "Playback finished!\n";
+    }
+}
+
+// some voodoo for volume control from this github issue
+// https://github.com/mackron/miniaudio/issues/26#issuecomment-406415191
+void controlVolume(ma_uint64 framesRead, void* pOutput, ma_decoder* pDecoder) {
+    float* samples = static_cast<float*>(pOutput);
+    ma_uint32 channelCount = pDecoder->outputChannels;
+
+    ma_uint64 totalSamples = framesRead * channelCount;
+    for (size_t i = 0; i < totalSamples; i++) {
+        samples[i] *= volumeMultiplier;
     }
 }
 
@@ -22,6 +35,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     ma_uint64 framesRead = 0;
     ma_decoder_read_pcm_frames(pDecoder, pOutput, frameCount, &framesRead); // playback of audio
     checkEndOfPlayback(framesRead, frameCount);
+    controlVolume(framesRead, pOutput, pDecoder);
 }
 
 void cmnd_load(std::string& rawUserInput, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
@@ -98,21 +112,28 @@ void cmnd_play(ma_decoder& decoder, ma_device& device, ma_device_config& deviceC
     std::cout << "Playing..." + '\n';
 }
 
-// cleanup devices after end of playback
-void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
-    while (true) {
-        const auto pauseInterval = std::chrono::milliseconds(1);
-        std::this_thread::sleep_for(pauseInterval);
+bool validateVolumeInput(std::string inputVolume, float& outVolume) {
+    try {
+        int vol = std::stoi(inputVolume);
 
-        // clean up devices if end of playback and the device is started
-        if (!soundIsPlaying && ma_device_is_started(&device)) {
-            ma_device_stop(&device);
-            ma_device_uninit(&device);
-            ma_decoder_uninit(&decoder);
-            decoderInitialized = MA_ERROR;
-            std::cout << "Cleaned up\n";
+        if (vol < 0 || vol > 100) {
+            return false;
         }
+        outVolume = vol / 100.0f; // convert % to decimal
+        return true;
     }
+    catch (...) {
+        return false;
+    }
+}
+
+void cmnd_volume(std::string inputVolume) {
+    float newVolume;
+    if (!validateVolumeInput(inputVolume, newVolume)) {
+        std::cout << "Please input a number from 0-100\n";
+        return;
+    }
+    volumeMultiplier = newVolume;
 }
 
 ma_uint64 frameToSeek(std::string strLength, ma_uint32 outputSampleRate) {
@@ -165,6 +186,7 @@ void handleCommands(Command cmnd, ma_decoder& decoder, ma_device& device, ma_dev
     if (cmnd.name == "load") cmnd_load(cmnd.parameter, decoder, device, deviceConfig, decoderInitialized);
     else if (cmnd.name == "play") cmnd_play(decoder, device, deviceConfig, decoderInitialized);
     else if (cmnd.name == "seek") cmnd_seek(cmnd.parameter, decoder, device);
+    else if (cmnd.name == "volume") cmnd_volume(cmnd.parameter);
 
     else std::cout << "Unknown command. Type 'help' for available commands\n";
 }
@@ -175,6 +197,23 @@ void processUserInput(ma_decoder& decoder, ma_device& device, ma_device_config& 
         Command cmnd = getInput();
         if (cmnd.name == "exit") break;
         handleCommands(cmnd, decoder, device, deviceConfig, decoderInitialized);
+    }
+}
+
+// cleanup devices after end of playback
+void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
+    while (true) {
+        const auto pauseInterval = std::chrono::milliseconds(1);
+        std::this_thread::sleep_for(pauseInterval);
+
+        // clean up devices if end of playback and the device is started
+        if (!soundIsPlaying && ma_device_is_started(&device)) {
+            ma_device_stop(&device);
+            ma_device_uninit(&device);
+            ma_decoder_uninit(&decoder);
+            decoderInitialized = MA_ERROR;
+            std::cout << "Cleaned up\n";
+        }
     }
 }
 
