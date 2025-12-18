@@ -1,6 +1,7 @@
 ﻿#include "include/main.h"
 
 std::mutex audioMutex;          // use this when reading frames outside of data callback in any way (stuff like seeking)
+bool paused = false;
 bool soundIsPlaying = false;
 float volumeMultiplier = 0.5;
 
@@ -34,6 +35,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
 
     ma_uint64 framesRead = 0;
     ma_decoder_read_pcm_frames(pDecoder, pOutput, frameCount, &framesRead); // playback of audio
+
     checkEndOfPlayback(framesRead, frameCount);
     controlVolume(framesRead, pOutput, pDecoder);
 }
@@ -91,16 +93,43 @@ void initializeDevice(ma_decoder& decoder, ma_device& device, ma_device_config& 
     }
 }
 
+struct Time {
+    int minutes;
+    int seconds;
+};
+
+Time getTime(ma_decoder& decoder, std::string type) {
+    std::lock_guard<std::mutex> lock(audioMutex);
+    int minutes = 0, seconds = 0;
+
+    ma_uint64 frames = 0;
+    if (type == "elapsed") {
+        ma_decoder_get_cursor_in_pcm_frames(&decoder, &frames);
+    }
+    else if (type == "length") {
+        ma_decoder_get_length_in_pcm_frames(&decoder, &frames);
+    }
+
+    // convert frames to seconds
+    if (decoder.outputSampleRate != 0) {
+        seconds = static_cast<int>(frames) / decoder.outputSampleRate;
+    }
+
+    minutes = seconds / 60;
+    seconds -= minutes * 60;
+    return { minutes, seconds };
+}
+
 void cmnd_play(ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
-    // start from the beginning if something is already playing
-    if (soundIsPlaying) {
-        const ma_uint64 beginningFrame = 0;
-        seekFrame(decoder, beginningFrame);
+    if (decoderInitialized != MA_SUCCESS) {
+        std::cout << "Please load a file using 'load <file_path>' first!\n";
         return;
     }
 
-    if (decoderInitialized != MA_SUCCESS) {
-        std::cout << "Please load a file using 'load <file_path>' first!\n";
+    // start from the beginning if something is already playing
+    if (soundIsPlaying && !paused) {
+        const ma_uint64 beginningFrame = 0;
+        seekFrame(decoder, beginningFrame);
         return;
     }
 
@@ -109,7 +138,28 @@ void cmnd_play(ma_decoder& decoder, ma_device& device, ma_device_config& deviceC
 
     soundIsPlaying = true;
 
-    std::cout << "Playing..." + '\n';
+    Time length = getTime(decoder, "length");
+    std::cout << "Playing..." << '\n'
+              << "Song length: "
+              << '[' << std::setfill('0') << std::setw(2) << length.minutes << ':' << std::setfill('0') << std::setw(2) << length.seconds << ']' << '\n';
+}
+
+void cmnd_stopPause(std::string input, ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
+    if (soundIsPlaying) {
+        ma_device_stop(&device);
+
+        if (input == "pause") {
+            paused = true;
+            std::cout << "Paused\n";
+        }
+        else if (input == "stop") {
+            soundIsPlaying = false;
+            ma_device_uninit(&device);
+            ma_decoder_uninit(&decoder);
+            decoderInitialized = MA_ERROR;
+            std::cout << "Stopped playback\n";
+        }
+    }
 }
 
 bool validateVolumeInput(std::string inputVolume, float& outVolume) {
@@ -165,6 +215,15 @@ void cmnd_seek(std::string strLength, ma_decoder& decoder, ma_device& device) {
     seekFrame(decoder, frameToSeek(strLength, decoder.outputSampleRate));
 }
 
+void cmnd_elapsedTime(ma_decoder& decoder) {
+    if (!soundIsPlaying) {
+        return;
+    }
+
+    Time elapsed = getTime(decoder, "elapsed");
+    std::cout << '[' << std::setfill('0') << std::setw(2) << elapsed.minutes << ':' << std::setfill('0') << std::setw(2) << elapsed.seconds << ']' << '\n';
+}
+
 struct Command {
     std::string name;
     std::string parameter;
@@ -185,8 +244,10 @@ Command getInput() {
 void handleCommands(Command cmnd, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
     if (cmnd.name == "load") cmnd_load(cmnd.parameter, decoder, device, deviceConfig, decoderInitialized);
     else if (cmnd.name == "play") cmnd_play(decoder, device, deviceConfig, decoderInitialized);
+    else if (cmnd.name == "pause" || cmnd.name == "stop") cmnd_stopPause(cmnd.name, device, decoder, decoderInitialized);
     else if (cmnd.name == "seek") cmnd_seek(cmnd.parameter, decoder, device);
     else if (cmnd.name == "volume") cmnd_volume(cmnd.parameter);
+    else if (cmnd.name == "elapsed") cmnd_elapsedTime(decoder);
 
     else std::cout << "Unknown command. Type 'help' for available commands\n";
 }

@@ -12,7 +12,7 @@ endif()
 project ("project-audio")
 
 # Add source to this project's executable.
-add_executable (project-audio "project-audio.cpp" "include/main.h" "include/miniaudio.h" "miniaudio.c" "project-audio (2).cpp.old")
+add_executable (project-audio "project-audio.cpp" "include/main.h" "include/miniaudio.h" "miniaudio.c")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET project-audio PROPERTY CXX_STANDARD 20)
