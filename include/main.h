@@ -1,21 +1,8 @@
 ﻿// main.h : Include file for standard system include files,
 // or project specific include files.
 
-//#pragma once
+#pragma once
 #include "miniaudio.h"
 
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <mutex>
-#include <stdio.h>
-#include <sstream>
-
-#include <filesystem>
-#include <algorithm>
-#include <iomanip>
-#include <regex>
-#include <vector>
-
-#include <thread>
-#include <chrono>
+void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized);
+int main();
