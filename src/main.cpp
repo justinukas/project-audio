@@ -7,10 +7,10 @@
 #include <thread>
 
 // cleanup devices after end of playback
-void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
+/*void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
     while (true) {
-        const auto pauseInterval = std::chrono::milliseconds(1);
-        std::this_thread::sleep_for(pauseInterval);
+        //const auto pauseInterval = std::chrono::milliseconds(1);
+        //std::this_thread::sleep_for(pauseInterval);
 
         // clean up devices if end of playback and the device is started
         if (!soundIsPlaying && ma_device_is_started(&device)) {
@@ -21,7 +21,7 @@ void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitializ
             std::cout << "Cleaned up\n";
         }
     }
-}
+}*/
 
 int main() {
     ma_decoder decoder;
@@ -31,7 +31,7 @@ int main() {
 
     std::cout << "Welcome to the gaming time audio player TM! Type 'help' for a list of commands\n";
     
-    std::thread(cleanup, std::ref(device), std::ref(decoder), std::ref(decoderInitialized)).detach();
+    //std::thread(cleanup, std::ref(device), std::ref(decoder), std::ref(decoderInitialized)).detach();
     processUserInput(decoder, device, deviceConfig, decoderInitialized);
     
     std::cout << "Exiting... ";

@@ -74,7 +74,7 @@ void cmnd_play(ma_decoder& decoder, ma_device& device, ma_device_config& deviceC
 
     soundIsPlaying = true;
 
-    Time length = getTime(decoder, "length");
+    Time length = getTime("length",decoder);
     std::cout << "Playing..." << '\n'
         << "Song length: "
         << '[' << std::setfill('0') << std::setw(2) << length.minutes << ':' << std::setfill('0') << std::setw(2) << length.seconds << ']' << '\n';

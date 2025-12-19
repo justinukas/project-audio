@@ -5,6 +5,7 @@
 #include <mutex>
 
 extern std::mutex audioMutex; // use this when reading frames outside of data callback in any way (like seeking)
+extern std::condition_variable playbackFinished;
 extern bool soundIsPlaying; 
 
 void static checkEndOfPlayback(ma_uint64 framesRead, ma_uint32 frameCount);

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <iomanip>
 
-Time getTime(ma_decoder& decoder, std::string type) {
+Time getTime(std::string type, ma_decoder& decoder) {
     std::lock_guard<std::mutex> lock(audioMutex);
     int minutes = 0, seconds = 0;
 
@@ -31,6 +31,6 @@ void cmnd_elapsedTime(ma_decoder& decoder) {
         return;
     }
 
-    Time elapsed = getTime(decoder, "elapsed");
+    Time elapsed = getTime("elapsed", decoder);
     std::cout << '[' << std::setfill('0') << std::setw(2) << elapsed.minutes << ':' << std::setfill('0') << std::setw(2) << elapsed.seconds << ']' << '\n';
 }

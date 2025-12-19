@@ -4,12 +4,16 @@
 #include <iostream>
 
 std::mutex audioMutex;
+std::condition_variable playbackFinished;   // chatgpt voodoo
 bool soundIsPlaying = false;
 
 void static checkEndOfPlayback(ma_uint64 framesRead, ma_uint32 frameCount) {
-    //soundIsPlaying = framesRead < frameCount;   <-- can write it like this instead later if i want
     if (framesRead < frameCount) {
+        //std::lock_guard<std::mutex> lock(audioMutex);
         soundIsPlaying = false;
+
+        playbackFinished.notify_one(); // chatgpt voodoo
+
         std::cout << "Playback finished!\n";
     }
 }

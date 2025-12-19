@@ -9,5 +9,5 @@ struct Time {
     int seconds;
 };
 
-Time getTime(ma_decoder& decoder, std::string type);
+Time getTime(std::string type, ma_decoder& decoder);
 void cmnd_elapsedTime(ma_decoder& decoder);
