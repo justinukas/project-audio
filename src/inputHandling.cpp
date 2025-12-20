@@ -31,6 +31,8 @@ Command static getInput() {
     return cmnd;
 }
 
+#include <filesystem>
+
 void static handleCommands(Command cmnd, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
     if (cmnd.name == "help") cmnd_help();
     else if (cmnd.name == "load") cmnd_load(cmnd.parameter, decoder, device, deviceConfig, decoderInitialized);
@@ -41,6 +43,15 @@ void static handleCommands(Command cmnd, ma_decoder& decoder, ma_device& device,
     else if (cmnd.name == "elapsed") cmnd_elapsedTime(decoder);
     else if (cmnd.name == "playlist") cmnd_playlist(cmnd.parameter, cmnd.parameter2, decoder, device, deviceConfig, decoderInitialized);
     else if (cmnd.name == "skip") cmnd_skip(decoder);
+
+
+    // DEBUG:
+    else if (cmnd.name == "test") {
+        std::filesystem::path dir("\\tmp");
+        std::filesystem::path file("foo.txt");
+        std::filesystem::path full_path = dir / file;
+        std::cout << dir << " / " << file << " --> " << full_path.generic_string() << std::endl;
+    }
 
     else std::cout << "Unknown command. Type 'help' for available commands\n";
 }

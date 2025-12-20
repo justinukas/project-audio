@@ -4,13 +4,15 @@
 #include "../include/seeking.h"         // seekToFrame
 #include "../include/time.h"            // Time, getLength()
 
-#include <vector>
+#include <map>
 #include <fstream>
 #include <thread>
 #include <filesystem>
 #include <iostream>
+namespace fs = std::filesystem;
 
 bool skipRequested = false;
+
 
 void static makePlaylistFile(std::string directory) {
     if (!std::filesystem::exists(directory)) {
@@ -34,10 +36,18 @@ void static makePlaylistFile(std::string directory) {
     out.close();
 }
 
-std::vector<std::string> readPlaylist(std::string directory) {
+std::map<int, std::string> readPlaylist(std::string directory) {
     std::ifstream in(directory + "/playlist.txt");
+    // add support for forward slash
+
     std::string line;
-    std::vector<std::string> playlist;
+    std::map<int, std::string> playlist;
+
+    if (!in.is_open()) {
+        playlist[0] = "OPEN_FAILED";
+        std::cout << "Failed to open file\n";
+        return playlist;
+    }
 
     while (std::getline(in, line))
     {
@@ -48,25 +58,22 @@ std::vector<std::string> readPlaylist(std::string directory) {
         std::getline(ss, number, ' ');
         std::getline(ss, path);
 
-        playlist.push_back(path);
+        playlist.insert({ stoi(number), path });
     }
     return playlist;
 }
 
 void static playPlaylist(std::string directory, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
-    std::vector<std::string> playlist = readPlaylist(directory);
-
-    std::ifstream in(directory + "\\playlist.txt");
-    // add support for forward slash
-
-    if (!in.is_open()) {
-        std::cerr << "Failed to open file\n";
+    std::map<int, std::string> playlist = readPlaylist(directory);
+    if (playlist[0] == "OPEN_FAILED") { 
         return;
     }
 
-    for (std::string &song : playlist) {
+    for (auto &item : playlist) {
         skipRequested = false;
-        //std::cout << song << std::endl;
+
+        std::string song = item.second;
+
         cmnd_load(song, decoder, device, deviceConfig, decoderInitialized);
         cmnd_play(decoder, device, deviceConfig, decoderInitialized);
 
