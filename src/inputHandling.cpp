@@ -31,16 +31,6 @@ Command static getInput() {
     return cmnd;
 }
 
-void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
-    if (ma_device_is_started(&device)) {
-        ma_device_stop(&device);
-    }
-    ma_device_uninit(&device);
-    ma_decoder_uninit(&decoder);
-    decoderInitialized = MA_ERROR;
-    std::cout << "Cleaned up\n";
-}
-
 void static handleCommands(Command cmnd, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
     if (cmnd.name == "help") cmnd_help();
     else if (cmnd.name == "load") cmnd_load(cmnd.parameter, decoder, device, deviceConfig, decoderInitialized);

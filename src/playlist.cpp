@@ -1,5 +1,5 @@
 #include "../include/playlist.h"
-#include "../include/playbackControl.h" // cmnd_{load, play}()
+#include "../include/playbackControl.h" // cmnd_{load, play}(), stopRequested
 #include "../include/dataCallback.h"    // soundIsPlaying
 #include "../include/seeking.h"         // seekToFrame
 #include "../include/time.h"            // Time, getLength()
@@ -9,6 +9,8 @@
 #include <thread>
 #include <filesystem>
 #include <iostream>
+
+bool skipRequested = false;
 
 void static makePlaylistFile(std::string directory) {
     if (!std::filesystem::exists(directory)) {
@@ -55,27 +57,32 @@ void static playPlaylist(std::string directory, ma_decoder& decoder, ma_device& 
     std::vector<std::string> playlist = readPlaylist(directory);
 
     std::ifstream in(directory + "\\playlist.txt");
-    //std::cout << directory << std::endl;
+    // add support for forward slash
 
     if (!in.is_open()) {
         std::cerr << "Failed to open file\n";
         return;
     }
 
-    //std::cout << playlist[0] << std::endl;
-    //std::cout << "tryna play ts ";
-
     for (std::string &song : playlist) {
-        std::cout << song;
+        skipRequested = false;
+        //std::cout << song << std::endl;
         cmnd_load(song, decoder, device, deviceConfig, decoderInitialized);
         cmnd_play(decoder, device, deviceConfig, decoderInitialized);
 
         // this some voodoo from chatgpt for making the threat sleep until sound is no longer playing
         std::unique_lock<std::mutex> lock(audioMutex);
-        playbackFinished.wait(lock, [] { return !soundIsPlaying; } );
+        playNextSound.wait(lock, [] {
+            return !soundIsPlaying || skipRequested;
+        });
+
+        if (stopRequested) { break; }
     }
-        
-    std::cout << "exiting thread";
+    if (!stopRequested) { 
+        cleanup(device, decoder, decoderInitialized); 
+    }
+    stopRequested = false;
+    std::cout << "DEBUG: exiting playlist thread\n";
 }
 
 void cmnd_playlist(std::string parameter, std::string& directory, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) { 
@@ -95,11 +102,6 @@ void cmnd_playlist(std::string parameter, std::string& directory, ma_decoder& de
 }
 
 void cmnd_skip(ma_decoder& decoder) {
-    //std::lock_guard<std::mutex> lock(audioMutex);
-
-    ma_uint64 totalFrames = 0;
-    ma_decoder_get_length_in_pcm_frames(&decoder, &totalFrames);
-
-    std::cout << "Total frames: " << totalFrames << "\n";
-    seekFrame(decoder, totalFrames-1);
+    skipRequested = true;
+    playNextSound.notify_one();
 }

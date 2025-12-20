@@ -1,12 +1,27 @@
 #include "../include/playbackControl.h"
-#include "../include/dataCallback.h"
-#include "../include/time.h"
-#include "../include/seeking.h"
+#include "../include/dataCallback.h"    // soundIsPlaying, playbackFinished, audioMutex
+#include "../include/time.h"            // getTime()
+#include "../include/seeking.h"         // seekFrame()
 
 #include <iostream>
 #include <iomanip>
 
-bool paused = false;
+//bool paused = false;
+bool stopRequested = false;
+
+void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
+    std::lock_guard<std::mutex> lock(audioMutex);
+    if (ma_device_is_started(&device)) {
+        ma_device_stop(&device);
+    }
+    ma_device_uninit(&device);
+    ma_decoder_uninit(&decoder);
+    decoderInitialized = MA_ERROR;
+
+    soundIsPlaying = false;
+    playNextSound.notify_one();
+    std::cout << "Cleaned up\n";
+}
 
 void cmnd_load(std::string& rawUserInput, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
     if (ma_device_is_started(&device)) {
@@ -17,6 +32,10 @@ void cmnd_load(std::string& rawUserInput, ma_decoder& decoder, ma_device& device
     if (rawUserInput.empty()) {
         std::cout << "No file path provided\n";
         return;
+    }
+
+    if (decoderInitialized != MA_ERROR) {
+        cleanup(device, decoder, decoderInitialized);
     }
 
     rawUserInput.erase(remove(rawUserInput.begin(), rawUserInput.end(), '\"'), rawUserInput.end());
@@ -63,7 +82,7 @@ void cmnd_play(ma_decoder& decoder, ma_device& device, ma_device_config& deviceC
     }
 
     // start from the beginning if something is already playing
-    if (soundIsPlaying && !paused) {
+    if (soundIsPlaying /* && !paused*/) {
         const ma_uint64 beginningFrame = 0;
         seekFrame(decoder, beginningFrame);
         return;
@@ -85,14 +104,14 @@ void cmnd_stopPause(std::string input, ma_device& device, ma_decoder& decoder, m
         ma_device_stop(&device);
 
         if (input == "pause") {
-            paused = true;
             std::cout << "Paused\n";
         }
         else if (input == "stop") {
-            soundIsPlaying = false;
-            ma_device_uninit(&device);
-            ma_decoder_uninit(&decoder);
-            decoderInitialized = MA_ERROR;
+            if (decoderInitialized != MA_ERROR) {
+                cleanup(device, decoder, decoderInitialized);
+            }
+
+            stopRequested = true;
             std::cout << "Stopped playback\n";
         }
     }
