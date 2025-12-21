@@ -4,9 +4,10 @@
 
 #include <string>
 #include <map>
+#include <filesystem>
 
-void static makePlaylistFile(std::string directory);
-void static playPlaylist(std::string directory, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized);
-std::map<int, std::string> readPlaylist(std::string directory);
-void cmnd_playlist(std::string parameter, std::string& directory, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized);
+void static makePlaylistFile(std::filesystem::path path, std::filesystem::path fullPath);
+void static playPlaylist(std::filesystem::path fullPath, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized);
+std::map<int, std::string> static readPlaylist(std::filesystem::path fullPath);
+void cmnd_playlist(std::string parameter, std::string& givenPath, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized);
 void cmnd_skip(ma_decoder& decoder);
