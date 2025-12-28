@@ -17,6 +17,5 @@ void cmnd_help() {
         // add playlist expalnation
 
         << "exit                   -exit program\n"
-        //<< "\nDEBUG COMMANDS:\n"
         ;
 }
