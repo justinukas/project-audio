@@ -2,6 +2,7 @@
 #include "../include/dataCallback.h"
 #include "../include/time.h"
 #include "../include/seeking.h"
+#include "../include/playlist.h"
 
 #include <iostream>
 #include <iomanip>
@@ -100,9 +101,8 @@ void cmnd_play(ma_decoder& decoder, ma_device& device, ma_device_config& deviceC
 
 void cmnd_stopPause(std::string input, ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
 	if (soundIsPlaying) {
-		ma_device_stop(&device);
-
 		if (input == "pause") {
+			ma_device_stop(&device);
 			std::cout << "Paused\n";
 		}
 		else if (input == "stop") {

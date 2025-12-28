@@ -4,14 +4,14 @@
 #include "../include/seeking.h"
 #include "../include/time.h"
 
-#include <map>
 #include <fstream>
 #include <thread>
-#include <filesystem>
 #include <iostream>
+
 namespace fs = std::filesystem;
 
 bool skipRequested = false;
+std::condition_variable playNextSound;
 
 void static makePlaylistFile(fs::path path, fs::path fullPath) {
 	if (!fs::exists(path)) {
@@ -44,7 +44,6 @@ std::map<int, std::string> static readPlaylist(fs::path fullPath) {
 
 	if (!in.is_open()) {
 		playlist[0] = "OPEN_FAILED";
-		std::cout << "Failed to open file\n";
 		return playlist;
 	}
 
@@ -65,6 +64,7 @@ std::map<int, std::string> static readPlaylist(fs::path fullPath) {
 void static playPlaylist(fs::path fullPath, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
 	std::map<int, std::string> playlist = readPlaylist(fullPath);
 	if (playlist[0] == "OPEN_FAILED") {
+		std::cout << "Failed to open file\n";
 		return;
 	}
 
@@ -75,11 +75,11 @@ void static playPlaylist(fs::path fullPath, ma_decoder& decoder, ma_device& devi
 		cmnd_load(song, decoder, device, deviceConfig, decoderInitialized);
 		cmnd_play(decoder, device, deviceConfig, decoderInitialized);
 
-		// "unrequests" skip after skipping
+		// "unrequest" skip after skipping
 		skipRequested = false;
 
-		// this some voodoo from chatgpt
 		std::unique_lock<std::mutex> lock(audioMutex);
+
 		// pauses playlist loop while:
 		// 1. sound is playing
 		// 2. skip isn't requested
@@ -90,13 +90,14 @@ void static playPlaylist(fs::path fullPath, ma_decoder& decoder, ma_device& devi
 		// stop playlist playback if stop is requested
 		if (stopRequested) { break; }
 	}
-	// cleans up playback when stop wasn't requested
-	// (because when you skip the last song, it continues playing)
+
+	// cleans up playback when you skip the last song because when you do, it continues playing
+	// it only cleans up when stop isn't requested because stop already calls the cleanup function
 	if (!stopRequested) {
 		cleanup(device, decoder, decoderInitialized);
 	}
 
-	// "unrequests" stop after playlist finishes
+	// "unrequest" stop after playlist finishes
 	stopRequested = false;
 	std::cout << "DEBUG: exiting playlist thread\n";
 }
