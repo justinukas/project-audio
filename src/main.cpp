@@ -1,6 +1,6 @@
 ﻿#include "../include/main.h"
-#include "../include/inputHandling.h"   // processUserInput
-#include "../include/dataCallback.h"    // soundIsPlaying
+#include "../include/inputHandling.h"
+#include "../include/dataCallback.h"
 
 #include <chrono>
 #include <iostream>

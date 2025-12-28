@@ -1,8 +1,8 @@
 #include "../include/playlist.h"
-#include "../include/playbackControl.h" // cmnd_{load, play}(), stopRequested
-#include "../include/dataCallback.h"    // soundIsPlaying
-#include "../include/seeking.h"         // seekToFrame
-#include "../include/time.h"            // Time, getLength()
+#include "../include/playbackControl.h"
+#include "../include/dataCallback.h"
+#include "../include/seeking.h"
+#include "../include/time.h"
 
 #include <map>
 #include <fstream>

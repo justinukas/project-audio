@@ -20,7 +20,7 @@ ma_uint64 frameToSeek(std::string strLength, ma_uint32 outputSampleRate) {
 
 	totalLengthSeconds = minutes * 60 + seconds;
 
-	frame = static_cast<ma_uint64>(totalLengthSeconds) * outputSampleRate;
+	frame = static_cast<ma_uint64>(totalLengthSeconds * outputSampleRate);
 	return frame;
 }
 
@@ -30,8 +30,10 @@ void cmnd_seek(std::string strLength, ma_decoder& decoder, ma_device& device) {
 		return;
 	}
 
-	// check for syntax 'mm:ss'
-	if (!std::regex_match(strLength, (std::regex)("^\\d{2}:\\d{2}$"))) {
+	// valid syntax is mm:ss
+	std::regex validSyntax("^\\d{2}:\\d{2}$");
+
+	if (!std::regex_match(strLength, validSyntax)) {
 		std::cout << "Invalid syntax\n";
 		return;
 	}

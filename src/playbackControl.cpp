@@ -1,7 +1,7 @@
 #include "../include/playbackControl.h"
-#include "../include/dataCallback.h"    // soundIsPlaying, playbackFinished, audioMutex
-#include "../include/time.h"            // getTime()
-#include "../include/seeking.h"         // seekFrame()
+#include "../include/dataCallback.h"
+#include "../include/time.h"
+#include "../include/seeking.h"
 
 #include <iostream>
 #include <iomanip>

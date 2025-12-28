@@ -18,7 +18,7 @@ Time getTime(std::string type, ma_decoder& decoder) {
 
 	// convert frames to seconds
 	if (decoder.outputSampleRate != 0) {
-		seconds = static_cast<int>(frames) / decoder.outputSampleRate;
+		seconds = static_cast<int>(frames / decoder.outputSampleRate);
 	}
 
 	minutes = seconds / 60;

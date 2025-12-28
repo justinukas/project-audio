@@ -1,11 +1,11 @@
 #include "../include/inputHandling.h"
 
-#include "../include/helpCommand.h"     // cmnd_help
-#include "../include/playbackControl.h" // cmnd_{load, play, stopPause}
-#include "../include/seeking.h"         // cmnd_seek
-#include "../include/volumeControl.h"   // cmnd_volume
-#include "../include/time.h"            // cmnd_elapsedTime
-#include "../include/playlist.h"        // cmnd_playlist
+#include "../include/helpCommand.h"
+#include "../include/playbackControl.h"
+#include "../include/seeking.h"
+#include "../include/volumeControl.h"
+#include "../include/time.h"
+#include "../include/playlist.h"
 
 #include <iostream>
 #include <string>
