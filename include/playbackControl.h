@@ -3,7 +3,6 @@
 #include "miniaudio.h"
 #include <string>
 
-//extern bool paused;
 extern bool stopRequested;
 
 void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized);

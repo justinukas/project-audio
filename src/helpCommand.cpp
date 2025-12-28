@@ -14,7 +14,7 @@ void cmnd_help() {
         << "elapsed                                   -get how much of the song has elapsed\n"
         << "playlist <make/play> <folder_directory>   -make/play a playlist of songs\n"
         << "skip                                      -skip current playlist song\n"
-        // add playlist expalnation
+        // add playlist explanation
 
         << "exit                   -exit program\n"
         ;

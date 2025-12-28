@@ -1,2 +1,8 @@
 playlist editor
 nameable playlist file
+
+make a playlist command interpreter thing similar to sth like diskpart
+it'll go like:
+PLAYLIST> 
+and when you put in input like make it'll look like:
+PLAYLIST> make
