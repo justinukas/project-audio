@@ -23,7 +23,7 @@ void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitializ
 	std::cout << "Cleaned up\n";
 }
 
-void cmnd_load(std::string& rawUserInput, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
+void cmnd_load(std::string rawUserInput, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
 	if (ma_device_is_started(&device)) {
 		ma_device_uninit(&device);
 		soundIsPlaying = false;

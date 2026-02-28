@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <filesystem>
 
 struct Command {
 	std::string name;
@@ -43,7 +44,7 @@ void processUserInput(ma_decoder& decoder, ma_device& device, ma_device_config& 
 		else if (cmnd.name == "seek") cmnd_seek(cmnd.parameter, decoder, device);
 		else if (cmnd.name == "volume") cmnd_volume(cmnd.parameter);
 		else if (cmnd.name == "elapsed") cmnd_elapsedTime(decoder);
-		else if (cmnd.name == "playlist") cmnd_playlist(cmnd.parameter, cmnd.parameter2, decoder, device, deviceConfig, decoderInitialized);
+		else if (cmnd.name == "playlist") cmnd_playlist(cmnd.parameter, std::filesystem::path(cmnd.parameter2), decoder, device, deviceConfig, decoderInitialized);
 		else if (cmnd.name == "skip") cmnd_skip(decoder);
 
 		else if (cmnd.name == "exit") break;
