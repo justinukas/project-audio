@@ -19,3 +19,10 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
 endif()
 
 # TODO: Add tests and install targets if needed.
+
+# Linux libraries (Probably remove them if building on Windows)
+target_link_libraries(project-audio
+    dl
+    pthread
+    m
+)
