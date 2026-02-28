@@ -10,7 +10,6 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <filesystem>
 
 struct Command {
 	std::string name;
@@ -18,16 +17,33 @@ struct Command {
 	std::string parameter2;
 };
 
+void stripQuotesApostrophes(std::string& path) {
+	if ((path.size() >= 2) && 
+		((path.front() == '"' && path.back() == '"') || 
+		(path.front() == '\'' && path.back() == '\''))) {
+
+		path = path.substr(1, path.size() - 2);
+	}
+}
+
 Command static getInput() {
 	std::string userInput;
 	Command cmnd;
 
 	std::getline(std::cin, userInput);
-	std::istringstream iss(userInput);
 
+	std::istringstream iss(userInput);
 	std::getline(iss, cmnd.name, ' ');
-	std::getline(iss, cmnd.parameter, ' ');
+	// for support of spaces in directories
+	cmnd.name == "load"
+		? std::getline(iss, cmnd.parameter)
+		: std::getline(iss, cmnd.parameter, ' ');
+	
 	std::getline(iss, cmnd.parameter2);
+
+	// strip quotes and apostrophes in case the parameters are paths
+	stripQuotesApostrophes(cmnd.parameter);
+	stripQuotesApostrophes(cmnd.parameter2);
 
 	return cmnd;
 }
@@ -44,7 +60,7 @@ void processUserInput(ma_decoder& decoder, ma_device& device, ma_device_config& 
 		else if (cmnd.name == "seek") cmnd_seek(cmnd.parameter, decoder, device);
 		else if (cmnd.name == "volume") cmnd_volume(cmnd.parameter);
 		else if (cmnd.name == "elapsed") cmnd_elapsedTime(decoder);
-		else if (cmnd.name == "playlist") cmnd_playlist(cmnd.parameter, std::filesystem::path(cmnd.parameter2), decoder, device, deviceConfig, decoderInitialized);
+		else if (cmnd.name == "playlist") cmnd_playlist(cmnd.parameter, cmnd.parameter2, decoder, device, deviceConfig, decoderInitialized);
 		else if (cmnd.name == "skip") cmnd_skip(decoder);
 
 		else if (cmnd.name == "exit") break;

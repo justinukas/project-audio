@@ -1,12 +1,14 @@
 #include "../include/playlist.h"
 #include "../include/playbackControl.h"
 #include "../include/dataCallback.h"
-#include "../include/seeking.h"
-#include "../include/time.h"
+//#include "../include/seeking.h"
+//#include "../include/time.h"
 
 #include <fstream>
 #include <thread>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 

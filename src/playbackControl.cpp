@@ -6,6 +6,9 @@
 
 #include <iostream>
 #include <iomanip>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 bool stopRequested = false;
 
@@ -23,24 +26,33 @@ void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitializ
 	std::cout << "Cleaned up\n";
 }
 
-void cmnd_load(std::string rawUserInput, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
+void cmnd_load(std::string userGivenPath, ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig, ma_result& decoderInitialized) {
 	if (ma_device_is_started(&device)) {
 		ma_device_uninit(&device);
 		soundIsPlaying = false;
 	}
 
-	if (rawUserInput.empty()) {
+	if (userGivenPath.empty()) {
 		std::cout << "No file path provided\n";
 		return;
 	}
 
-	if (decoderInitialized != MA_ERROR) {
+	if (decoderInitialized == MA_SUCCESS) {
 		cleanup(device, decoder, decoderInitialized);
 	}
 
-	rawUserInput.erase(remove(rawUserInput.begin(), rawUserInput.end(), '\"'), rawUserInput.end());
-	const char* audioPath = rawUserInput.c_str();
+	fs::path path(userGivenPath);
+	if (!fs::exists(path)) {
+		std::cout << "Path does not exist\n";
+		return;
+	}
 
+	if (!fs::is_regular_file(path)) {
+		std::cout << "Path is not a regular file\n";
+		return;
+	}
+
+	const char* audioPath = userGivenPath.c_str();
 	decoderInitialized = ma_decoder_init_file(audioPath, NULL, &decoder);
 
 	if (decoderInitialized != MA_SUCCESS) {

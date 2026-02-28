@@ -1,7 +1,7 @@
-1 C:\GitHub Repos\project-audio\playlist test\YOURE A DEAD MAN.mp3
-2 C:\GitHub Repos\project-audio\playlist test\[ALEXANDROSchannel] todayyyyy.mp3
-3 C:\GitHub Repos\project-audio\playlist test\[amazarashi Official YouTu] kyoukaisen.mp3
-4 C:\GitHub Repos\project-audio\playlist test\[asc] binary.mp3
-5 C:\GitHub Repos\project-audio\playlist test\[asc] moment.mp3
-6 C:\GitHub Repos\project-audio\playlist test\[Eve] Ghost Avenue.mp3
-7 C:\GitHub Repos\project-audio\playlist test\[NA] Burn My Dread.mp3
+1 /home/justinukas/Git Projects/project-audio/playlist test/[ALEXANDROSchannel] todayyyyy.mp3
+2 /home/justinukas/Git Projects/project-audio/playlist test/[amazarashi Official YouTu] kyoukaisen.mp3
+3 /home/justinukas/Git Projects/project-audio/playlist test/[asc] binary.mp3
+4 /home/justinukas/Git Projects/project-audio/playlist test/[asc] moment.mp3
+5 /home/justinukas/Git Projects/project-audio/playlist test/[Eve] Ghost Avenue.mp3
+6 /home/justinukas/Git Projects/project-audio/playlist test/[NA] Burn My Dread.mp3
+7 /home/justinukas/Git Projects/project-audio/playlist test/YOURE A DEAD MAN.mp3
