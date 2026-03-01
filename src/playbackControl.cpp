@@ -63,7 +63,7 @@ void cmnd_load(std::string userGivenPath, ma_decoder& decoder, ma_device& device
 	std::cout << "File " << audioPath << " loaded successfuly!\n";
 }
 
-void static configureDevice(ma_decoder& decoder, ma_device_config& deviceConfig) {
+void configureDevice(ma_decoder& decoder, ma_device_config& deviceConfig) {
 	deviceConfig = ma_device_config_init(ma_device_type_playback);
 	deviceConfig.playback.format = decoder.outputFormat;
 	deviceConfig.playback.channels = decoder.outputChannels;
@@ -72,7 +72,7 @@ void static configureDevice(ma_decoder& decoder, ma_device_config& deviceConfig)
 	deviceConfig.pUserData = &decoder;
 }
 
-void static initializeDevice(ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig) {
+void initializeDevice(ma_decoder& decoder, ma_device& device, ma_device_config& deviceConfig) {
 	if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
 		std::cout << "Failed to open playback device\n";
 		ma_decoder_uninit(&decoder);

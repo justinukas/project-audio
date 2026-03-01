@@ -26,7 +26,7 @@ void stripQuotesApostrophes(std::string& path) {
 	}
 }
 
-Command static getInput() {
+Command getInput() {
 	std::string userInput;
 	Command cmnd;
 
