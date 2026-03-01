@@ -12,7 +12,7 @@ namespace fs = std::filesystem;
 
 bool stopRequested = false;
 
-void cleanup(ma_device& device, ma_decoder& decoder, ma_result& decoderInitialized) {
+void cleanup(ma_decoder& decoder, ma_device& device,ma_result& decoderInitialized) {
 	std::lock_guard<std::mutex> lock(audioMutex);
 	if (ma_device_is_started(&device)) {
 		ma_device_stop(&device);
@@ -38,7 +38,7 @@ void cmnd_load(std::string userGivenPath, ma_decoder& decoder, ma_device& device
 	}
 
 	if (decoderInitialized == MA_SUCCESS) {
-		cleanup(device, decoder, decoderInitialized);
+		cleanup(decoder, device, decoderInitialized);
 	}
 
 	fs::path path(userGivenPath);
@@ -119,7 +119,7 @@ void cmnd_stopPause(std::string input, ma_device& device, ma_decoder& decoder, m
 		}
 		else if (input == "stop") {
 			if (decoderInitialized != MA_ERROR) {
-				cleanup(device, decoder, decoderInitialized);
+				cleanup(decoder, device, decoderInitialized);
 			}
 
 			stopRequested = true;
