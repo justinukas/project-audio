@@ -1,5 +1,5 @@
-#include "../include/seeking.h"
-#include "../include/dataCallback.h"
+#include "../include/seeking.hpp"
+#include "../include/dataCallback.hpp"
 
 #include <regex>
 #include <iostream>

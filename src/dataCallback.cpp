@@ -1,6 +1,6 @@
-#include "../include/dataCallback.h"
-#include "../include/volumeControl.h"
-#include "../include/playlist.h"
+#include "../include/dataCallback.hpp"
+#include "../include/volumeControl.hpp"
+#include "../include/playlist.hpp"
 
 #include <iostream>
 

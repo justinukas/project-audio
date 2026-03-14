@@ -1,11 +1,11 @@
-#include "../include/inputHandling.h"
+#include "../include/inputHandling.hpp"
 
-#include "../include/helpCommand.h"
-#include "../include/playbackControl.h"
-#include "../include/seeking.h"
-#include "../include/volumeControl.h"
-#include "../include/time.h"
-#include "../include/playlist.h"
+#include "../include/helpCommand.hpp"
+#include "../include/playbackControl.hpp"
+#include "../include/seeking.hpp"
+#include "../include/volumeControl.hpp"
+#include "../include/time.hpp"
+#include "../include/playlist.hpp"
 
 #include <iostream>
 #include <string>

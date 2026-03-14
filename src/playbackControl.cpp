@@ -1,8 +1,8 @@
-#include "../include/playbackControl.h"
-#include "../include/dataCallback.h"
-#include "../include/time.h"
-#include "../include/seeking.h"
-#include "../include/playlist.h"
+#include "../include/playbackControl.hpp"
+#include "../include/dataCallback.hpp"
+#include "../include/time.hpp"
+#include "../include/seeking.hpp"
+#include "../include/playlist.hpp"
 
 #include <iostream>
 #include <iomanip>

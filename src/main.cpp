@@ -1,5 +1,5 @@
-﻿#include "../include/main.h"
-#include "../include/inputHandling.h"
+﻿#include "../include/main.hpp"
+#include "../include/inputHandling.hpp"
 
 #include <iostream>
 

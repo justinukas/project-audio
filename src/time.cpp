@@ -1,5 +1,5 @@
-#include "../include/time.h"
-#include "../include/dataCallback.h"
+#include "../include/time.hpp"
+#include "../include/dataCallback.hpp"
 
 #include <iostream>
 #include <iomanip>

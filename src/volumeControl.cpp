@@ -1,4 +1,4 @@
-#include "../include/volumeControl.h"
+#include "../include/volumeControl.hpp"
 
 #include <iostream>
 
