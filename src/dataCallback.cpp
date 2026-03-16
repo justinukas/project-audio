@@ -1,17 +1,11 @@
 #include "../include/dataCallback.hpp"
-#include "../include/volumeControl.hpp"
-#include "../include/playlist.hpp"
-
+#include "../include/globalVars.hpp"
 #include <iostream>
 
-std::mutex audioMutex;  
-bool soundIsPlaying = false;
-
 void checkEndOfPlayback(ma_uint64 framesRead, ma_uint64 frameCount) {
-	if (framesRead < frameCount) {
+    if (framesRead < frameCount) {
 		soundIsPlaying = false;
-
-		playNextSound.notify_one(); // chatgpt voodoo
+		playbackFinished = true;
 
 		std::cout << "Playback finished!\n";
 	}
@@ -25,12 +19,12 @@ void setVolume(ma_uint64 frameCount, void* pOutput, ma_decoder* pDecoder) {
 
 	ma_uint64 totalSamples = frameCount * channelCount;
 	for (size_t i = 0; i < totalSamples; i++) {
-		samples[i] *= volumeMultiplier;
+	    samples[i] *= volumeMultiplier;
 	}
 	// I guess the size of a sample's element signifies the volume of it
 }
 
-void data_callback(ma_device* pDevice, void* pFramesOut, const void* pInput, ma_uint32 frameCount) {
+void dataCallback(ma_device* pDevice, void* pFramesOut, const void* pInput, ma_uint32 frameCount) {
 	std::lock_guard<std::mutex> lock(audioMutex);
 
 	ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
@@ -39,7 +33,7 @@ void data_callback(ma_device* pDevice, void* pFramesOut, const void* pInput, ma_
 	}
 
 	ma_uint64 framesRead = 0;
-	ma_decoder_read_pcm_frames(pDecoder, pFramesOut, frameCount, &framesRead); // playback of audio
+	ma_decoder_read_pcm_frames(pDecoder, pFramesOut, frameCount, &framesRead);
 
 	checkEndOfPlayback(framesRead, frameCount);
 	setVolume(framesRead, pFramesOut, pDecoder);

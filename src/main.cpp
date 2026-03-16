@@ -1,17 +1,11 @@
-﻿#include "../include/main.hpp"
-#include "../include/inputHandling.hpp"
-
-#include <iostream>
+#define MINIAUDIO_IMPLEMENTATION
+#include "../include/miniaudio.h"
+#include "../include/commandParsing.hpp"
+#include "../include/audioPlayer.hpp"
 
 int main() {
-	ma_decoder decoder;
-	ma_device device;
-	ma_device_config deviceConfig;
-	ma_result decoderInitialized = MA_ERROR;
+    CommandParser parser;
+    AudioPlayer player;
 
-	std::cout << "Welcome to the gaming time audio player TM! Type 'help' for a list of commands\n";
-
-	processUserInput(decoder, device, deviceConfig, decoderInitialized);
-
-	std::cout << "Exiting... ";
+    parser.run(player);
 }
