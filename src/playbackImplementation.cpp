@@ -46,10 +46,7 @@ void AudioPlayer::initializeFile(std::string songPath) {
     std::cout << "File " << audioPath << " loaded successfuly!\n";
 }
 
-#include <thread>
-
 void AudioPlayer::play() {
-	std::cout << "play id:" << std::this_thread::get_id() << std::endl;
 	if (decoder.getResult() != MA_SUCCESS) {
 		std::cout << "Please load a file using 'load <file_path>' first!\n";
 		return;

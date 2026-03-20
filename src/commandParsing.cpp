@@ -1,4 +1,5 @@
 #include "../include/commandParsing.hpp"
+#include <thread>
 
 void outputHelp() {
     std::cout
@@ -20,20 +21,33 @@ void outputHelp() {
         ;
 }
 
-void CommandParser::run(AudioPlayer player) {
+bool playlistMode = false;
+
+void CommandParser::run(AudioPlayer& player) {
 	// do a while loop so that the user can always input a command
+    
 	while (true) {
 		Command cmnd = parsedInput();
 
         if (cmnd.name == "help") outputHelp();
-        else if (cmnd.name == "load") player.initializeFile(cmnd.parameter1);
-        else if (cmnd.name == "play") player.play();
+        else if (cmnd.name == "load") {
+            if (playlistMode) {
+                std::cout << "Please exit playlist mode first.";
+                continue;
+            }
+            player.initializeFile(cmnd.parameter1); 
+        }
+        else if (cmnd.name == "play" && !playlistMode) player.play();
         else if (cmnd.name == "pause") player.pause();
         else if (cmnd.name == "stop") player.stop();
         else if (cmnd.name == "seek") player.seek(cmnd.parameter1);
         else if (cmnd.name == "volume") player.setVolume(cmnd.parameter1);
         else if (cmnd.name == "elapsed") player.getElapsedTime();
-        else if (cmnd.name == "playlist") player.playlistMakerPlayer(cmnd.parameter1, cmnd.parameter2);
+
+
+        else if (cmnd.name == "playlist") playlistMode = true;
+        else if (cmnd.name == "make" && playlistMode) player.makePlaylist(cmnd.parameter1);
+        else if (cmnd.name == "play" && playlistMode) std::thread(&AudioPlayer::playPlaylist, &player, cmnd.parameter1).detach();
         else if (cmnd.name == "skip") player.skipPlaylistSong();
 
         else if (cmnd.name == "exit") break;

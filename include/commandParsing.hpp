@@ -2,8 +2,9 @@
 
 #include "audioPlayer.hpp"
 
-#include <iostream>
 #include <sstream>
+
+extern bool playlistMode;
 
 struct Command {
     std::string name;
@@ -27,6 +28,7 @@ private:
         std::string userInput;
 	    Command command;
 
+		if (playlistMode) std::cout << "PLAYLIST> ";
 	    std::getline(std::cin, userInput);
 
     	std::istringstream iss(userInput);
@@ -46,5 +48,5 @@ private:
     }
 
 public:
-    void run(AudioPlayer player);
+    void run(AudioPlayer& player);
 };

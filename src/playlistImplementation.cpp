@@ -2,25 +2,8 @@
 
 #include <thread>
 
-void AudioPlayer::playlistMakerPlayer(std::string parameter, fs::path folderPath) {
-	if (parameter != "make" && parameter != "play") {
-		std::cout << "Invalid command. Available 'playlist' options: 'make', 'play'\n";
-		return;
-	}
-
-	fs::path file("playlist.txt");	  	   // define file name
-	fs::path filePath = folderPath / file; // append file to folder path
-
-	if (parameter == "make") {
-		playlistManager.makePlaylistFile(folderPath, filePath);
-	}
-	else if (parameter == "play") {
-		// start seperate thread so that the user can still run commands while the playlist is running
-		std::thread(&AudioPlayer::playPlaylist, this, folderPath).detach();
-	}
-}
-
 void AudioPlayer::playPlaylist(fs::path filePath) {
+	std::cout << filePath << std::endl;
     std::map<int, std::string> playlist = playlistManager.playlist(filePath);
     // Validate playlist
     if (playlist.empty()) {
@@ -35,7 +18,7 @@ void AudioPlayer::playPlaylist(fs::path filePath) {
 	    }
 	}
 
-    playPlaylistSong(playlist[1]);
+    //playPlaylistSong(playlist[1]);
 
 	// clean up post playback (in case it wasn't cleaned via stop)
 	if (!stopRequested) {
