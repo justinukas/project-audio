@@ -1,13 +1,13 @@
 #include "../include/audioPlayer.hpp"
+#include "../include/outputProcessor.hpp"
 
 #include <thread>
 
 void AudioPlayer::playPlaylist(fs::path filePath) {
-	std::cout << filePath << std::endl;
     std::map<int, std::string> playlist = playlistManager.playlist(filePath);
     // Validate playlist
     if (playlist.empty()) {
-    	std::cout << "Failed to open file\n";
+    	queueMsg("Failed to open file\n");
     	return;
 	}
 
@@ -17,8 +17,6 @@ void AudioPlayer::playPlaylist(fs::path filePath) {
 	    	break; // stop was requested
 	    }
 	}
-
-    //playPlaylistSong(playlist[1]);
 
 	// clean up post playback (in case it wasn't cleaned via stop)
 	if (!stopRequested) {

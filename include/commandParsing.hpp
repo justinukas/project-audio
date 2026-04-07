@@ -1,6 +1,7 @@
 #pragma once
 
 #include "audioPlayer.hpp"
+#include "outputProcessor.hpp"
 
 #include <sstream>
 
@@ -28,7 +29,6 @@ private:
         std::string userInput;
 	    Command command;
 
-		if (playlistMode) std::cout << "PLAYLIST> ";
 	    std::getline(std::cin, userInput);
 
     	std::istringstream iss(userInput);
