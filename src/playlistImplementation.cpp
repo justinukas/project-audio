@@ -3,7 +3,7 @@
 
 #include <thread>
 
-void AudioPlayer::playPlaylist(fs::path filePath) {
+void AudioPlayer::playPlaylist(std::string filePath) {
     std::map<int, std::string> playlist = playlistManager.playlist(filePath);
     // Validate playlist
     if (playlist.empty()) {

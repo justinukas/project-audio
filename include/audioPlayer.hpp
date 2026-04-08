@@ -26,6 +26,7 @@ private:
     bool paused = false;
     std::atomic<bool> stopRequested;
     std::atomic<bool> skipRequested;
+    bool playlistMode = false;
 
     ma_device_config configuration() {
         ma_device_config config = ma_device_config_init(ma_device_type_playback);
@@ -66,7 +67,7 @@ public:
 		    cleanup();
 	    }
 
-	    //stopRequested = true
+	    stopRequested = true;
         std::cout << "Stopped playback\n";
     }
     void pause() {
@@ -83,8 +84,12 @@ public:
     void getElapsedTime() { timeChecker.getElapsedTime(decoder); }
     void setVolume(std::string inputVolume) { volumeControl.setVolume(inputVolume); }
 
-    void playPlaylist(fs::path filePath);
-    void makePlaylist(fs::path folderPath) { 
+    bool isPlaylistMode() { return playlistMode; }
+    void enablePlaylistMode() { playlistMode = true; }
+    void disablePlaylistMode() { playlistMode = false; }
+
+    void playPlaylist(std::string filePath);
+    void makePlaylist(std::string folderPath) { 
         fs::path file = "playlist.txt";
         fs::path filePath = folderPath / file;
         playlistManager.makePlaylistFile(folderPath, filePath);

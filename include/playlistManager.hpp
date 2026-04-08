@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <filesystem>
-#include<map>
+#include <map>
 
 namespace fs = std::filesystem;
 

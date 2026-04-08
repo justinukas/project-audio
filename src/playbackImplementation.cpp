@@ -31,7 +31,7 @@ void AudioPlayer::initializeFile(std::string songPath) {
     }
 
     if (!fs::is_regular_file(path)) {
-       	std::cout << "Path is not an audio file\n";
+       	std::cout << "Path is not a file\n";
        	return;
     }
 

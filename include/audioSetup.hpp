@@ -29,7 +29,7 @@ public:
 class AudioDecoder {
 private:
   	ma_decoder decoder;
-  	ma_result result;
+  	ma_result result = MA_ERROR;
 
 public:
   	void uninit() { ma_decoder_uninit(&decoder); }

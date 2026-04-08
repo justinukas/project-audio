@@ -5,8 +5,7 @@
 
 #include <sstream>
 
-extern bool playlistMode;
-
+// if by the end its only 1 param left, remove param2
 struct Command {
     std::string name;
     std::string parameter1;
@@ -34,9 +33,10 @@ private:
     	std::istringstream iss(userInput);
     	std::getline(iss, command.name, ' ');
     	// for support of spaces in directories
-    	command.name == "load"
-    		? std::getline(iss, command.parameter1)
-    		: std::getline(iss, command.parameter1, ' ');
+		if (command.name == "load" || command.name == "play") {
+			std::getline(iss, command.parameter1);
+		}
+		else { std::getline(iss, command.parameter1, ' '); }
 	
     	std::getline(iss, command.parameter2);
 
