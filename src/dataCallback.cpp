@@ -1,13 +1,13 @@
 #include "../include/dataCallback.hpp"
 #include "../include/globalVars.hpp"
-#include <iostream>
+#include "../include/outputProcessor.hpp"
 
 void checkEndOfPlayback(ma_uint64 framesRead, ma_uint64 frameCount) {
     if (framesRead < frameCount) {
 		soundIsPlaying = false;
 		playbackFinished = true;
 
-		std::cout << "Playback finished!\n";
+		msg("Playback finished!");
 	}
 }
 

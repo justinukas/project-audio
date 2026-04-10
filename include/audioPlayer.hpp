@@ -6,6 +6,7 @@
 #include "timeChecker.hpp"
 #include "volumeControl.hpp"
 #include "playlistManager.hpp"
+#include "outputProcessor.hpp"
 
 #include <string>
 #include <filesystem>
@@ -27,6 +28,7 @@ private:
     std::atomic<bool> stopRequested;
     std::atomic<bool> skipRequested;
     bool playlistMode = false;
+    bool cleanedUp = false;
 
     ma_device_config configuration() {
         ma_device_config config = ma_device_config_init(ma_device_type_playback);
@@ -49,18 +51,19 @@ private:
   	    decoder.clearResult();
 
   	    soundIsPlaying = false;
-  	    std::cout << "Cleaned up\n";
+        cleanedUp = true;
+  	    msg("DEBUG: Cleaned up");
     }
 
     bool playPlaylistSong(const std::string& song);
 
 public:    
-	void initializeFile(std::string songPath);
-    void play();
+	bool initializeFile(std::string songPath);
+    bool play();
 
     void stop() {
         if (!soundIsPlaying) {
-            std::cout << "Nothing is playing\n";
+            msg("Nothing is playing");
 		    return;
 	    }
 	    if (decoder.getResult() != MA_ERROR) {
@@ -68,16 +71,16 @@ public:
 	    }
 
 	    stopRequested = true;
-        std::cout << "Stopped playback\n";
+        msg("Stopped playback");
     }
     void pause() {
         if (!soundIsPlaying) {
-            std::cout << "Nothing is playing\n";
+            msg("Nothing is playing");
 		    return;
 	    }
 	    device.stop();
 	    paused = true;
-        std::cout << "Paused playback\n";
+        msg("Paused playback");
     }
 
     void seek(std::string timeToSeek) { seeker.seek(timeToSeek, decoder); }
@@ -96,7 +99,7 @@ public:
     }
     void skipPlaylistSong() {
         if (!soundIsPlaying) {
-            std::cout << "Nothing to skip\n";
+            msg("Nothing to skip");
             return;
         }
         skipRequested = true; 

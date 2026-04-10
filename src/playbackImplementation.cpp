@@ -1,4 +1,5 @@
 #include "../include/audioPlayer.hpp"
+#include "../include/outputProcessor.hpp"
 
 #include <filesystem>
 #include <iostream>
@@ -6,7 +7,7 @@
 
 namespace fs = std::filesystem;
 
-void AudioPlayer::initializeFile(std::string songPath) {
+bool AudioPlayer::initializeFile(std::string songPath) {
   	// i forgor why do this and not just cleanup
   	// because if device is started, chances are, result is MA_SUCCESS, so
   	// everything gets cleaned up either way
@@ -16,78 +17,89 @@ void AudioPlayer::initializeFile(std::string songPath) {
   	}
 
   	if (songPath.empty()) {
-        std::cout << "No file path provided\n";
-        return;
+        msg("No file path provided");
+        return false;
   	}
 
-	if (decoder.getResult() == MA_SUCCESS) {
+	if (decoder.getResult() == MA_SUCCESS && !cleanedUp) {
        	cleanup();
     }
 
     fs::path path(songPath);
     if (!fs::exists(songPath)) {
-	  	std::cout << "Path does not exist\n";
-       	return;
+	  	msg("Path does not exist");
+       	return false;
     }
 
     if (!fs::is_regular_file(path)) {
-       	std::cout << "Path is not a file\n";
-       	return;
+       	msg("Path is not a file");
+       	return false;
     }
 
     const char* audioPath = songPath.c_str();
     decoder.setResult(decoder.initFile(audioPath));
 
     if (decoder.getResult() != MA_SUCCESS) {
-      	std::cout << "Could not load file: \"" << audioPath << "\"\n";
-       	return;
+		std::ostringstream oss;
+		oss << "Could not load file: \"" << audioPath << '\"';
+		msg(oss.str());
+       	return false;
     }
 
-    std::cout << "File " << audioPath << " loaded successfuly!\n";
+	cleanedUp = false;
+	std::ostringstream oss;
+	oss << "File " << audioPath << " loaded succesfully!";
+	msg(oss.str());
+
+	return true;
 }
 
-void AudioPlayer::play() {
+bool AudioPlayer::play() {
 	if (decoder.getResult() != MA_SUCCESS) {
-		std::cout << "Please load a file using 'load <file_path>' first!\n";
-		return;
+		msg("Please load a file using 'load <file_path>' first!");
+		return false;
 	}
 
 	if (!soundIsPlaying && playbackFinished) {
-		std::cout << "Please load a new file\n";
-		return;
+		msg("Please load a new file");
+		return false;
 	}
 
 	// resume if paused
 	if (paused) {
 		device.start();
 		paused = false;
-		return;
+		return false;
 	}
 
 	const std::string audioStartTime = "00:00";
 	// start from the beginning if something is already playing
 	if (soundIsPlaying) {
 		seeker.seek(audioStartTime, decoder);
-		return;
+		return false;
 	}
 
     if (!device.initialize(configuration())) {
-        std::cout << "Failed to open playback device\n";
+        msg("Failed to open playback device");
 		decoder.uninit();
-		return;
+		return false;
     }
 
     if (!device.start()) {
-        std::cout << "Failed to start playback device\n";
+        msg("Failed to start playback device");
 		device.uninit();
 		decoder.uninit();
-		return;
+		return false;
     }
 
 	soundIsPlaying = true;
 
 	Time length = timeChecker.getTime("length", decoder);
-	std::cout << "Playing..." << '\n'
+	std::ostringstream oss;
+	oss << "Playing..." << '\n'
 		<< "Song length: "
-		<< '[' << std::setfill('0') << std::setw(2) << length.minutes << ':' << std::setfill('0') << std::setw(2) << length.seconds << ']' << '\n';
+		<< '[' << std::setfill('0') << std::setw(2) << length.minutes << ':' << std::setfill('0') << std::setw(2) << length.seconds << ']';
+	msg(oss.str());
+
+	return true;
 }

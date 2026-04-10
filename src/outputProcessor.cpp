@@ -1,20 +1,19 @@
-#include "../include/commandParsing.hpp"
-
-#include <queue>
+#include "../include/globalVars.hpp"
+#include <mutex>
 #include <string>
 #include <iostream>
 
-std::queue<std::string> messageQueue;
 std::mutex queueMutex;
 
-void queueMsg(const std::string& msg) {
+void msg(const std::string& message) {
     std::lock_guard<std::mutex> lock(queueMutex);
-    messageQueue.push(msg);
-}
 
-void processOutput() {
-    while (!messageQueue.empty()) {
-        std::cout << messageQueue.front();
-        messageQueue.pop();
+    // move to start of line and clear any existing user typing
+    std::cout << "\r\x1B[K";
+
+    // print message
+    std::cout << message << '\n';
+    if (playlistMode)  {
+        std::cout << "PLAYLIST> " << std::flush;
     }
 }

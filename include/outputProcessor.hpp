@@ -1,3 +1,2 @@
 #include <string>
-void queueMsg(const std::string& msg);
-void processOutput();
+void msg(const std::string& message);

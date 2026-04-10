@@ -7,7 +7,7 @@ void AudioPlayer::playPlaylist(std::string filePath) {
     std::map<int, std::string> playlist = playlistManager.playlist(filePath);
     // Validate playlist
     if (playlist.empty()) {
-    	queueMsg("Failed to open file\n");
+    	msg("Failed to open file");
     	return;
 	}
 
@@ -19,21 +19,26 @@ void AudioPlayer::playPlaylist(std::string filePath) {
 	}
 
 	// clean up post playback (in case it wasn't cleaned via stop)
-	if (!stopRequested) {
+	if (!cleanedUp) {
+		// crashes here if there was an error encountered in load or play stages
 	    cleanup();
 	}
 
     stopRequested = false;
-    std::cout << "DEBUG: exiting playlist thread\n";
+    msg("DEBUG: exiting playlist thread");
 }
 
 // Plays one song and returns whether to continue. Returns false if playback should stop, true if to continue
 bool AudioPlayer::playPlaylistSong(const std::string& song) {
-	std::cout << song << std::endl;
     skipRequested = false;
 
-	initializeFile(song);
-	play();
+	// skip song if play or load fail
+	if(!initializeFile(song)) {
+		return true;
+	}
+	if(!play()) {
+		return true;
+	}
 
 	// Wait for song to finish or skip/stop to be requested
     while(soundIsPlaying && !skipRequested && !stopRequested) {

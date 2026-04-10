@@ -1,4 +1,5 @@
 #include "globalVars.hpp"
+#include "outputProcessor.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -20,8 +21,14 @@ public:
 
 	    // return empty map if ifstream failed
 	    if (!in.is_open()) {
+			msg("File reading failed");
 		    return {};
 	    }
+
+		if (filePath.extension() != ".txt") {
+			msg("File is not a text file");
+			return {};
+		}
 
 	    while (std::getline(in, line))
 	    {
@@ -39,7 +46,7 @@ public:
     // Core function: make a playlist of audio files from specified directory
     void makePlaylistFile(fs::path path, fs::path fullPath) {
 	    if (!fs::exists(path)) {
-	    	std::cout << "Invalid path\n";
+	    	msg("Invalid path");
 	    	return;
 	    }
 

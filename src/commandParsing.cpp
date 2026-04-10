@@ -1,9 +1,10 @@
 #include "../include/commandParsing.hpp"
-#include <thread>
 #include "../include/outputProcessor.hpp"
+#include <thread>
 
 void outputHelp() {
-    std::cout
+    std::ostringstream oss;
+    oss
         << "Available commands:\n"
         << "BASIC:\n"
         << "help\n"
@@ -24,40 +25,39 @@ void outputHelp() {
         << "skip                                      -skip current playlist song\n"
         << "exit                                      -exit playlist mode\n"
         ;
+    msg(oss.str());
 }
 
 void CommandParser::run(AudioPlayer& player) {    
+    //std::thread t(processOutput, &player);
+    //t.detach();
+
     // do a while loop so that the user can always input a command
 	while (true) {
-        // process outputs BEFORE input begins
-        processOutput();
-        if (player.isPlaylistMode()) std::cout << "PLAYLIST> ";
-
 		Command cmnd = parsedInput();
 
         if (cmnd.name == "help") outputHelp();
         else if (cmnd.name == "load") {
-            if (player.isPlaylistMode()) {
-                std::cout << "Please exit playlist mode first.";
+            if (playlistMode) {
+                msg("Please exit playlist mode first.");
                 continue;
             }
-            std::cout << cmnd.parameter1;
             player.initializeFile(cmnd.parameter1); 
         }
-        else if (cmnd.name == "play" && !player.isPlaylistMode()) player.play();
+        else if (cmnd.name == "play" && !playlistMode) player.play();
         else if (cmnd.name == "pause") player.pause();
         else if (cmnd.name == "stop") player.stop();
         else if (cmnd.name == "seek") player.seek(cmnd.parameter1);
         else if (cmnd.name == "volume") player.setVolume(cmnd.parameter1);
         else if (cmnd.name == "elapsed") player.getElapsedTime();
 
-        else if (cmnd.name == "playlist") player.enablePlaylistMode();
-        else if (cmnd.name == "make" && player.isPlaylistMode()) player.makePlaylist(cmnd.parameter1);
-        else if (cmnd.name == "play" && player.isPlaylistMode()) std::thread(&AudioPlayer::playPlaylist, &player, cmnd.parameter1).detach();
+        else if (cmnd.name == "playlist") { playlistMode = true; std::cout << "PLAYLIST> "; }//player.enablePlaylistMode();
+        else if (cmnd.name == "make" && playlistMode) player.makePlaylist(cmnd.parameter1);
+        else if (cmnd.name == "play" && playlistMode) std::thread(&AudioPlayer::playPlaylist, &player, cmnd.parameter1).detach();
         else if (cmnd.name == "skip") player.skipPlaylistSong();
 
-        else if (cmnd.name == "exit" && player.isPlaylistMode()) player.disablePlaylistMode(); 
-        else if (cmnd.name == "exit" && !player.isPlaylistMode()) break;
-        else queueMsg("Unknown command. Type 'help' for available commands\n");
+        else if (cmnd.name == "exit" && playlistMode) playlistMode = false; 
+        else if (cmnd.name == "exit" && !playlistMode) break;
+        else msg("Unknown command. Type 'help' for available commands");
 	}
 }

@@ -4,3 +4,4 @@ extern std::mutex audioMutex;  // use this when reading frames outside of data c
 extern std::atomic<bool> soundIsPlaying;
 extern std::atomic<bool> playbackFinished;
 extern std::atomic<double> volumeMultiplier;
+extern std::atomic<bool> playlistMode;
