@@ -420,3 +420,4 @@ FodyWeavers.xsd
 
 # Playlist stuff
 playlist.txt
+/playlist test/*
