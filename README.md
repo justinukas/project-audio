@@ -14,3 +14,4 @@ Skipping playlist songs<br>
 
 ## TBA:<br>
 Queue functionality (addition, shuffling, moving of songs in queue)
+Make a modern GUI with FTXUI or Qt
