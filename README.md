@@ -10,7 +10,7 @@ Seeking<br>
 Checking elapsed time<br>
 Making of playlist files based on existing audio files in specified directory<br>
 Playback based on the playlist file<br>
-Skipping<br>
+Skipping playlist songs<br>
 
 ## TBA:<br>
 Queue functionality (addition, shuffling, moving of songs in queue)
