@@ -13,5 +13,5 @@ Playback based on the playlist file<br>
 Skipping playlist songs<br>
 
 ## TBA:<br>
-Queue functionality (addition, shuffling, moving of songs in queue)
+Queue functionality (addition, shuffling, moving of songs in queue)<br>
 Make a modern GUI with FTXUI or Qt
