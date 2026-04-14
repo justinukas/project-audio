@@ -8,7 +8,6 @@ Stopping playback<br>
 Picking volume<br>
 Seeking<br>
 Checking elapsed time<br>
-
 Making of playlist files based on existing audio files in specified directory<br>
 Playback based on the playlist file<br>
 Skipping
