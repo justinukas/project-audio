@@ -8,14 +8,6 @@
 namespace fs = std::filesystem;
 
 bool AudioPlayer::initializeFile(std::string songPath) {
-  	// i forgor why do this and not just cleanup
-  	// because if device is started, chances are, result is MA_SUCCESS, so
-  	// everything gets cleaned up either way
-  	if (device.isStarted()) {
-        device.uninit();
-        soundIsPlaying = false;
-  	}
-
   	if (songPath.empty()) {
         msg("No file path provided");
         return false;

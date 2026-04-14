@@ -8,7 +8,7 @@ void outputHelp() {
         << "Available commands:\n"
         << "BASIC:\n"
         << "help\n"
-        << "load <file_directory>                     -load the audio file\n" /*+ (only .wav, .mp3, and .flac are supported) -idk for sure tho*/
+        << "load <file_directory>                     -load the audio file\n" /* (only .wav, .mp3, and .flac are supported) -idk for sure tho*/
         << "                                          (TIP: you can drag and drop your file into the command line to quickly input the directory!)\n"
         << "play                                      -start or resume playback\n"
         << "stop                                      -stop playback (stops playlist too)\n"
@@ -29,8 +29,6 @@ void outputHelp() {
 }
 
 void CommandParser::run(AudioPlayer& player) {    
-    //std::thread t(processOutput, &player);
-    //t.detach();
 
     // do a while loop so that the user can always input a command
 	while (true) {
@@ -51,7 +49,7 @@ void CommandParser::run(AudioPlayer& player) {
         else if (cmnd.name == "volume") player.setVolume(cmnd.parameter1);
         else if (cmnd.name == "elapsed") player.getElapsedTime();
 
-        else if (cmnd.name == "playlist") { playlistMode = true; std::cout << "PLAYLIST> "; }//player.enablePlaylistMode();
+        else if (cmnd.name == "playlist") { playlistMode = true; std::cout << "PLAYLIST> "; }
         else if (cmnd.name == "make" && playlistMode) player.makePlaylist(cmnd.parameter1);
         else if (cmnd.name == "play" && playlistMode) std::thread(&AudioPlayer::playPlaylist, &player, cmnd.parameter1).detach();
         else if (cmnd.name == "skip") player.skipPlaylistSong();
