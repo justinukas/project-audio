@@ -1,7 +1,7 @@
 # project-audio
-A simple CLI-based audio playback program written in C++ which uses the [miniaudio library](https://github.com/mackron/miniaudio)
+A CLI-based audio playback program written in C++ which uses the [miniaudio library](https://github.com/mackron/miniaudio)
 
-- <p style="font-size: 30px;">Features:</p><br>
+## Features:<br>
 Loading and playback of audio files<br>
 Pausing<br>
 Stopping playback<br>
@@ -10,4 +10,7 @@ Seeking<br>
 Checking elapsed time<br>
 Making of playlist files based on existing audio files in specified directory<br>
 Playback based on the playlist file<br>
-Skipping
+Skipping<br>
+
+## - TBA:<br>
+Queue functionality (addition, shuffling, moving of songs in queue)
