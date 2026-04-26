@@ -32,8 +32,8 @@ private:
   	ma_result result = MA_ERROR;
 
 public:
+	// Initialization
   	void uninit() { ma_decoder_uninit(&decoder); }
-	void seek(ma_uint64 frame) { ma_decoder_seek_to_pcm_frame(&decoder, frame); }
 	ma_result initFile(const char* file) { return ma_decoder_init_file(file, NULL, &decoder); }
 
 	// Results
@@ -46,6 +46,8 @@ public:
 	ma_uint32 getChannels() { return decoder.outputChannels; }
 	ma_uint32 getSampleRate() { return decoder.outputSampleRate; }
 
+	// Frame related
+	void seek(ma_uint64 frame) { ma_decoder_seek_to_pcm_frame(&decoder, frame); }
 	void getElapsedFrames(ma_uint64* frames) { ma_decoder_get_cursor_in_pcm_frames(&decoder, frames); }
 	void getAudioLength(ma_uint64* frames) { ma_decoder_get_length_in_pcm_frames(&decoder, frames); }
 };

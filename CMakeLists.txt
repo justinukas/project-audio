@@ -12,7 +12,7 @@ endif()
 project ("ooptest")
 
 # Add source to this project's executable.
-add_executable (ooptest "include/miniaudio.h" "src/main.cpp" "include/audioPlayer.hpp" "src/playbackImplementation.cpp" "src/playlistImplementation.cpp" "include/audioSetup.hpp" "include/commandParsing.hpp" "src/commandParsing.cpp" "include/dataCallback.hpp" "src/dataCallback.cpp" "include/seeker.hpp" "include/timeChecker.hpp" "include/volumeControl.hpp" "include/globalVars.hpp" "src/globalVarsDefaults.cpp" "include/playlistManager.hpp" "include/outputProcessor.hpp" "src/outputProcessor.cpp")
+add_executable (ooptest "include/miniaudio.h" "src/main.cpp" "include/audioPlayer.hpp" "src/playbackImplementation.cpp" "src/playlistImplementation.cpp" "include/audioSetup.hpp" "include/commandParsing.hpp" "include/dataCallback.hpp" "src/dataCallback.cpp" "include/seeker.hpp" "include/timeChecker.hpp" "include/volumeControl.hpp" "include/globalVars.hpp" "src/globalVarsDefaults.cpp" "include/playlistManager.hpp" "include/outputProcessor.hpp" "src/outputProcessor.cpp" "include/commandExecutor.hpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ooptest PROPERTY CXX_STANDARD 20)

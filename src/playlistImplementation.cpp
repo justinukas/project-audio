@@ -19,7 +19,7 @@ void AudioPlayer::playPlaylist(std::string filePath) {
 	}
 
 	// clean up post playback (in case it wasn't cleaned via stop)
-	if (!cleanedUp) {
+	if (decoder.getResult() == MA_SUCCESS) {
 		// crashes here if there was an error encountered in load or play stages
 	    cleanup();
 	}

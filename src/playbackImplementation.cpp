@@ -2,7 +2,6 @@
 #include "../include/outputProcessor.hpp"
 
 #include <filesystem>
-#include <iostream>
 #include <string>
 
 namespace fs = std::filesystem;
@@ -13,7 +12,8 @@ bool AudioPlayer::initializeFile(std::string songPath) {
         return false;
   	}
 
-	if (decoder.getResult() == MA_SUCCESS && !cleanedUp) {
+	// if not clean
+	if (decoder.getResult() == MA_SUCCESS) {
        	cleanup();
     }
 
@@ -38,7 +38,6 @@ bool AudioPlayer::initializeFile(std::string songPath) {
        	return false;
     }
 
-	cleanedUp = false;
 	std::ostringstream oss;
 	oss << "File " << audioPath << " loaded succesfully!";
 	msg(oss.str());
@@ -71,6 +70,11 @@ bool AudioPlayer::play() {
 		return false;
 	}
 
+	//AudioPlayer::play(): * Calls Device.init(decoder, this).
+
+	//Inside that init, the Device calls its own configuration() helper using the decoder's info.
+
+	//Calls Device.start().
     if (!device.initialize(configuration())) {
         msg("Failed to open playback device");
 		decoder.uninit();
@@ -86,12 +90,8 @@ bool AudioPlayer::play() {
 
 	soundIsPlaying = true;
 
-	Time length = timeChecker.getTime("length", decoder);
-	std::ostringstream oss;
-	oss << "Playing..." << '\n'
-		<< "Song length: "
-		<< '[' << std::setfill('0') << std::setw(2) << length.minutes << ':' << std::setfill('0') << std::setw(2) << length.seconds << ']';
-	msg(oss.str());
+	msg("Playing...");
+	timeChecker.outputTime("length", decoder);
 
 	return true;
 }

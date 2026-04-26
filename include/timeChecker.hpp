@@ -4,6 +4,7 @@
 #include "audioSetup.hpp"
 #include "globalVars.hpp"
 #include "audioSetup.hpp"
+#include "outputProcessor.hpp"
 
 #include <string>
 #include <iomanip>
@@ -15,8 +16,8 @@ struct Time {
 };
 
 class TimeChecker {
-public:
-	Time getTime(std::string type, AudioDecoder decoder) {
+private:
+	Time timeByType(std::string type, AudioDecoder decoder) {
 		std::lock_guard<std::mutex> lock(audioMutex);
 		int minutes = 0, seconds = 0;
 
@@ -37,13 +38,18 @@ public:
 		seconds -= minutes * 60;
 		return { minutes, seconds };
 	}
-
-	void getElapsedTime(AudioDecoder decoder) {
+public:
+	void outputTime(std::string type, AudioDecoder decoder) {
 		if (!soundIsPlaying) {
 			return;
 		}
 
-		Time elapsed = getTime("elapsed", decoder);
-		std::cout << '[' << std::setfill('0') << std::setw(2) << elapsed.minutes << ':' << std::setfill('0') << std::setw(2) << elapsed.seconds << ']' << '\n';
+		Time timeToOutput = timeByType(type, decoder);
+		std::ostringstream oss;
+		if (type == "length") {
+			oss << "Song length: ";
+		}
+		oss << '[' << std::setfill('0') << std::setw(2) << timeToOutput.minutes << ':' << std::setfill('0') << std::setw(2) << timeToOutput.seconds << ']' << '\n';
+		msg(oss.str());
 	}
 };

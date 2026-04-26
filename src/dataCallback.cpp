@@ -25,7 +25,7 @@ void setVolume(ma_uint64 frameCount, void* pOutput, ma_decoder* pDecoder) {
 }
 
 void dataCallback(ma_device* pDevice, void* pFramesOut, const void* pInput, ma_uint32 frameCount) {
-	std::lock_guard<std::mutex> lock(audioMutex);
+	//std::lock_guard<std::mutex> lock(audioMutex);
 
 	ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
 	if (pDecoder == NULL || soundIsPlaying == false) {

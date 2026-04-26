@@ -27,8 +27,6 @@ private:
     bool paused = false;
     std::atomic<bool> stopRequested;
     std::atomic<bool> skipRequested;
-    bool playlistMode = false;
-    bool cleanedUp = false;
 
     ma_device_config configuration() {
         ma_device_config config = ma_device_config_init(ma_device_type_playback);
@@ -36,7 +34,7 @@ private:
         config.playback.channels = decoder.getChannels();
         config.sampleRate = decoder.getSampleRate();
         config.dataCallback = dataCallback;
-        config.pUserData = &decoder;
+        config.pUserData = this;
 
         return config;
     }
@@ -51,7 +49,7 @@ private:
   	    decoder.clearResult();
 
   	    soundIsPlaying = false;
-        cleanedUp = true;
+        playbackFinished = true;
   	    msg("DEBUG: Cleaned up");
     }
 
@@ -84,12 +82,9 @@ public:
     }
 
     void seek(std::string timeToSeek) { seeker.seek(timeToSeek, decoder); }
-    void getElapsedTime() { timeChecker.getElapsedTime(decoder); }
+    void getElapsedTime() { timeChecker.outputTime("elapsed", decoder); }
+    void getSongLength() { timeChecker.outputTime("length", decoder); }
     void setVolume(std::string inputVolume) { volumeControl.setVolume(inputVolume); }
-
-    bool isPlaylistMode() { return playlistMode; }
-    void enablePlaylistMode() { playlistMode = true; }
-    void disablePlaylistMode() { playlistMode = false; }
 
     void playPlaylist(std::string filePath);
     void makePlaylist(std::string folderPath) { 

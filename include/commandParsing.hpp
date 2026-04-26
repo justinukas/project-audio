@@ -1,13 +1,12 @@
 #pragma once
-
-#include "audioPlayer.hpp"
 #include "outputProcessor.hpp"
 
 #include <sstream>
+#include <iostream>
 
 // if by the end its only 1 param left, remove param2
 struct Command {
-    std::string name;
+    std::string type;
     std::string parameter1;
     std::string parameter2;
 };
@@ -15,7 +14,7 @@ struct Command {
 class CommandParser {
 private:
     // Helper methods
-    static void stripQuotesApostrophes(std::string& path) {
+    void stripQuotesApostrophes(std::string& path) {
 	    if ((path.size() >= 2) && 
 		   ((path.front() == '"' && path.back() == '"') || 
 		    (path.front() == '\'' && path.back() == '\''))) {
@@ -23,17 +22,17 @@ private:
 		    path = path.substr(1, path.size() - 2);
         }
 	}
-
-    const Command parsedInput()  {
+public:
+    Command parsedInput()  {
         std::string userInput;
 	    Command command;
 
 	    std::getline(std::cin, userInput);
 
     	std::istringstream iss(userInput);
-    	std::getline(iss, command.name, ' ');
+    	std::getline(iss, command.type, ' ');
     	// for support of spaces in directories
-		if (command.name == "load" || command.name == "play") {
+		if (command.type == "load" || command.type == "play") {
 			std::getline(iss, command.parameter1);
 		}
 		else { std::getline(iss, command.parameter1, ' '); }
@@ -46,7 +45,4 @@ private:
 
 	    return command;
     }
-
-public:
-    void run(AudioPlayer& player);
 };

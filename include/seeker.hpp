@@ -2,6 +2,7 @@
 
 #include "globalVars.hpp"
 #include "audioSetup.hpp"
+#include "outputProcessor.hpp"
 
 #include <string>
 #include <sstream>
@@ -29,20 +30,25 @@ private:
         decoder.seek(frame);
     }
 
+	bool syntaxValid(std::string str) {
+		// valid syntax is mm:ss
+	    std::regex validSyntax("^\\d{2}:\\d{2}$");
+
+		if (!std::regex_match(str, validSyntax)) {
+	    	msg("Invalid syntax");
+	    	return false;
+	    }
+		else return true;
+	}
+
 public:
     void seek(std::string timeToSeek, AudioDecoder& decoder) {
 	    if (!soundIsPlaying) {
-	    	std::cout << "Nothing is currently playing\n";
+	    	msg("Nothing is currently playing");
 	    	return;
 	    }
 
-	    // valid syntax is mm:ss
-	    std::regex validSyntax("^\\d{2}:\\d{2}$");
-
-	    if (!std::regex_match(timeToSeek, validSyntax)) {
-	    	std::cout << "Invalid syntax\n";
-	    	return;
-	    }
+		syntaxValid(timeToSeek);
 
 	    seekFrame(decoder, frameToSeek(timeToSeek, decoder.getSampleRate()));
     }

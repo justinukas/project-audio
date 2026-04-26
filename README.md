@@ -8,6 +8,7 @@ Stopping playback<br>
 Picking volume<br>
 Seeking<br>
 Checking elapsed time<br>
+Checking song length<br>
 Making of playlist files based on existing audio files in specified directory<br>
 Playback based on the playlist file<br>
 Skipping playlist songs<br>
@@ -16,5 +17,6 @@ Skipping playlist songs<br>
 Build using CMake >=3.10
 
 ## To be added:<br>
+Handle audio device change (plugging in other headphones, speakers, etc.)<br>
 Queue functionality (addition, shuffling, moving of songs in queue)<br>
 Make a modern GUI with FTXUI or Qt
