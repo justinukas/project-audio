@@ -28,7 +28,7 @@ add_executable (ooptest
   "include/commandExecutor.hpp"
   #src/audioMaster.cpp
   src/dataCallback.cpp
-  src/audioDevice.cpp)
+  src/audioMaster.cpp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ooptest PROPERTY CXX_STANDARD 20)

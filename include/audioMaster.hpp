@@ -21,6 +21,10 @@ struct SharedAudioState {
     std::atomic<bool> skipRequested;
 };
 
+
+class AudioDevice;
+class AudioDecoder;
+
 class AudioMaster {
     friend class DataCallback;
 private:
@@ -33,22 +37,10 @@ private:
     //VolumeController volumeController;
     //PlaylistMaster playlistMaster;
 public:
-    AudioMaster() : device(this){}
+    AudioMaster();
 
-    void cleanup() {
-        //std::lock_guard<std::mutex> lock(audioMutex);
-  	    if (device.isStarted()) {
-        	device.stop();
-  	    }
-  	    device.uninit();
-  	    decoder.uninit();
-  	    decoder.clearResult();
-
-  	    audioState.soundIsPlaying.store(false);
-        audioState.playbackFinished.store(true);
-  	    msg("DEBUG: Cleaned up");
-    }
-    bool initializeDevice() { return device.initialize(); }
+    void cleanup();
+    bool initializeDevice();
 
     SharedAudioState* statePointer() { return &audioState; }
 };

@@ -2,7 +2,6 @@
 
 #include "../libraries/miniaudio.h"
 
-#include "audioMaster.hpp"
 #include "dataCallback.hpp"
 
 class AudioDecoder {
@@ -37,6 +36,8 @@ public:
 	ma_decoder* decoderPointer() { return &decoder; }
 };
 
+class AudioMaster;
+
 class AudioDevice {
 private:
 	AudioMaster* master;
@@ -56,6 +57,18 @@ public:
 	}
   	void stop() { ma_device_stop(&device); }
 	
-	bool initialize(AudioDecoder decoder);
+	bool initialize(AudioDecoder decoder) {
+		ma_device_config config = ma_device_config_init(ma_device_type_playback);
+    	config.playback.format = decoder.getFormat();
+    	config.playback.channels = decoder.getChannels();
+    	config.sampleRate = decoder.getSampleRate();
+    	config.dataCallback = dataCallback.dataCallback;
+    	config.pUserData = master;
+
+		if (ma_device_init(NULL, &config, &device) == MA_SUCCESS) {
+			return true;
+		}
+		else { return false; }
+	}
   	void uninit() { ma_device_uninit(&device); }
 };

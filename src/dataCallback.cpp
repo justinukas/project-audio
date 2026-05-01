@@ -1,4 +1,5 @@
 #include "../include/dataCallback.hpp"
+#include "../include/outputProcessor.hpp"
 #include "../include/audioMaster.hpp"
 
 void DataCallback::checkEndOfPlayback(ma_uint64 framesRead, ma_uint64 frameCount, AudioMaster* master) {
@@ -37,5 +38,5 @@ void DataCallback::dataCallback(ma_device* pDevice, void* pFramesOut, const void
 	ma_uint64 framesRead = master->decoder.readFrames(pFramesOut, frameCount);
 
 	checkEndOfPlayback(framesRead, frameCount, master);
-		pplyVolume(frameCount, pFramesOut, decoder, master->volumeController.currentVolume());
+	//applyVolume(frameCount, pFramesOut, decoder, master->volumeController.currentVolume());
 }
