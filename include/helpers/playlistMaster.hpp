@@ -1,4 +1,4 @@
-#include "globalVars.hpp"
+/*#pragma once
 #include "outputProcessor.hpp"
 
 #include <fstream>
@@ -10,8 +10,8 @@
 
 namespace fs = std::filesystem;
 
-class PlaylistManager {
-public:
+class PlaylistMaster {
+private:
     // Reads songs from file
     std::map<int, std::string> playlist(fs::path filePath) {
 	    std::ifstream in(filePath);
@@ -43,7 +43,28 @@ public:
 	    }
 	    return playlist;
     }
-    // Core function: make a playlist of audio files from specified directory
+	bool playPlaylistSong(const std::string& song) {
+    	skipRequested = false;
+
+		// skip song if play or load fail
+		if(!initializeFile(song)) {
+			return true;
+		}
+		if(!play()) {
+			return true;
+		}
+
+		// Wait for song to finish or skip/stop to be requested
+    	while(soundIsPlaying && !skipRequested && !stopRequested) {
+        	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    	}
+
+		// return false if stop was requested (end playlist), true to continue
+		return !stopRequested;
+	}
+
+public:
+    // core function: make a playlist of audio files from specified directory
     void makePlaylistFile(fs::path path, fs::path fullPath) {
 	    if (!fs::exists(path)) {
 	    	msg("Invalid path");
@@ -68,4 +89,42 @@ public:
 	    	}
 	    }
     }
+
+	void playPlaylist(fs::path filePath) {
+		std::map<int, std::string> playlist = playlist(filePath);
+    	// Validate playlist
+    	if (playlist.empty()) {
+    		msg("Failed to open file");
+    		return;
+		}
+
+		// loop through the whole playlist 
+  		for (const auto& [x, song] : playlist) {
+		    if (!playPlaylistSong(song)) {
+		    	break; // stop was requested
+		    }
+		}
+
+		// clean up post playback (in case it wasn't cleaned via stop)
+		if (decoder.getResult() == MA_SUCCESS) {
+			// crashes here if there was an error encountered in load or play stages
+		    cleanup();
+		}
+
+    	stopRequested = false;
+    	msg("DEBUG: exiting playlist thread");
+	}
+    void makePlaylist(std::string folderPath) { 
+        fs::path file = "playlist.txt";
+        fs::path filePath = folderPath / file;
+        playlistManager.makePlaylistFile(folderPath, filePath);
+    }
+    void skipPlaylistSong() {
+        if (!soundIsPlaying) {
+            msg("Nothing to skip");
+            return;
+        }
+        skipRequested = true; 
+    }
 };
+*/

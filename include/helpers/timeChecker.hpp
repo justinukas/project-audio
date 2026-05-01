@@ -1,9 +1,7 @@
-#pragma once
+/*#pragma once
 
 #include "miniaudio.h"
-#include "audioSetup.hpp"
-#include "globalVars.hpp"
-#include "audioSetup.hpp"
+#include "audioMaster.hpp"
 #include "outputProcessor.hpp"
 
 #include <string>
@@ -18,7 +16,7 @@ struct Time {
 class TimeChecker {
 private:
 	Time timeByType(std::string type, AudioDecoder decoder) {
-		std::lock_guard<std::mutex> lock(audioMutex);
+		//std::lock_guard<std::mutex> lock(audioMutex);
 		int minutes = 0, seconds = 0;
 
 		ma_uint64 frames = 0;
@@ -41,6 +39,7 @@ private:
 public:
 	void outputTime(std::string type, AudioDecoder decoder) {
 		if (!soundIsPlaying) {
+			msg("Nothing is currently playing");
 			return;
 		}
 
@@ -53,3 +52,4 @@ public:
 		msg(oss.str());
 	}
 };
+*/

@@ -1,12 +1,10 @@
-#pragma once
+/*#pragma once
 
-#include "globalVars.hpp"
-#include "audioSetup.hpp"
+#include "audioMaster.hpp"
 #include "outputProcessor.hpp"
 
 #include <string>
 #include <sstream>
-#include <iostream>
 #include <regex>
 
 class Seeker {
@@ -26,7 +24,7 @@ private:
     }
 
     void seekFrame(AudioDecoder& decoder, ma_uint64 frame) {
-        std::lock_guard<std::mutex> lock(audioMutex);
+        //std::lock_guard<std::mutex> lock(audioMutex);
         decoder.seek(frame);
     }
 
@@ -53,3 +51,4 @@ public:
 	    seekFrame(decoder, frameToSeek(timeToSeek, decoder.getSampleRate()));
     }
 };
+*/

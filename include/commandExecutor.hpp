@@ -1,4 +1,6 @@
-#include "audioPlayer.hpp"
+#pragma once
+
+//#include "audioMaster.hpp"
 #include "commandParsing.hpp"
 #include <thread>
 
@@ -30,7 +32,7 @@ private:
         msg(oss.str());
     }
 public:
-    std::string run(AudioPlayer& player, const Command& cmnd) {
+    /*std::string run(AudioMaster& master, const Command& cmnd) {
         // do a while loop so that the user can always input a command
         if (cmnd.type == "help") outputHelp();
         else if (cmnd.type == "load") {
@@ -40,22 +42,22 @@ public:
             }
             player.initializeFile(cmnd.parameter1); 
         }
-        else if (cmnd.type == "play" && !playlistMode) player.play();
-        else if (cmnd.type == "pause") player.pause();
-        else if (cmnd.type == "stop") player.stop();
-        else if (cmnd.type == "seek") player.seek(cmnd.parameter1);
-        else if (cmnd.type == "volume") player.setVolume(cmnd.parameter1);
-        else if (cmnd.type == "elapsed") player.getElapsedTime();
-        else if (cmnd.type == "length") player.getSongLength();
+        else if (cmnd.type == "play" && !playlistMode) master.play();
+        else if (cmnd.type == "pause") master.pause();
+        else if (cmnd.type == "stop") master.stop();
+        else if (cmnd.type == "seek") master.seek(cmnd.parameter1);
+        else if (cmnd.type == "volume") master.setVolume(cmnd.parameter1);
+        else if (cmnd.type == "elapsed") master.getElapsedTime();
+        else if (cmnd.type == "length") master.getSongLength();
 
         else if (cmnd.type == "playlist") { playlistMode = true; std::cout << "PLAYLIST> "; }
-        else if (cmnd.type == "make" && playlistMode) player.makePlaylist(cmnd.parameter1);
-        else if (cmnd.type == "play" && playlistMode) std::thread(&AudioPlayer::playPlaylist, &player, cmnd.parameter1).detach();
+        else if (cmnd.type == "make" && playlistMode) master.makePlaylist(cmnd.parameter1);
+        else if (cmnd.type == "play" && playlistMode) std::thread(&AudioPlayer::playPlaylist, &master, cmnd.parameter1).detach();
         else if (cmnd.type == "skip") player.skipPlaylistSong();
 
         else if (cmnd.type == "exit" && playlistMode) playlistMode = false; 
         else if (cmnd.type == "exit" && !playlistMode) return "break";
         else msg("Unknown command. Type 'help' for available commands");
         return "";
-    }
+    }*/
 };

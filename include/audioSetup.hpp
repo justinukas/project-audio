@@ -1,30 +1,9 @@
 #pragma once
 
-#include "miniaudio.h"
+#include "../libraries/miniaudio.h"
 
-class AudioDevice {
-private:
-	ma_device device;
-
-public:
-  	ma_bool32 isStarted() const { return ma_device_is_started(&device); }
-	bool start() {
-		if (ma_device_start(&device) == MA_SUCCESS) {
-			return true;
-		}
-		else { return false; }
-	}
-  	void stop() { ma_device_stop(&device); }
-
-	
-	bool initialize(const ma_device_config& config) {
-		if (ma_device_init(NULL, &config, &device) == MA_SUCCESS) {
-			return true;
-		}
-		else { return false; }
-	}
-  	void uninit() { ma_device_uninit(&device); }
-};
+#include "audioMaster.hpp"
+#include "dataCallback.hpp"
 
 class AudioDecoder {
 private:
@@ -50,4 +29,33 @@ public:
 	void seek(ma_uint64 frame) { ma_decoder_seek_to_pcm_frame(&decoder, frame); }
 	void getElapsedFrames(ma_uint64* frames) { ma_decoder_get_cursor_in_pcm_frames(&decoder, frames); }
 	void getAudioLength(ma_uint64* frames) { ma_decoder_get_length_in_pcm_frames(&decoder, frames); }
+
+	ma_uint64 readFrames(void* pFramesOut, ma_uint64 frameCount) {
+    	return ma_decoder_read_pcm_frames(&decoder, pFramesOut, frameCount, NULL);
+	}
+
+	ma_decoder* decoderPointer() { return &decoder; }
+};
+
+class AudioDevice {
+private:
+	AudioMaster* master;
+
+	ma_device device;
+	DataCallback dataCallback;
+public:
+	AudioDevice(AudioMaster* m) : master(m){}
+
+
+  	ma_bool32 isStarted() const { return ma_device_is_started(&device); }
+	bool start() {
+		if (ma_device_start(&device) == MA_SUCCESS) {
+			return true;
+		}
+		else { return false; }
+	}
+  	void stop() { ma_device_stop(&device); }
+	
+	bool initialize(AudioDecoder decoder);
+  	void uninit() { ma_device_uninit(&device); }
 };

@@ -1,4 +1,3 @@
-#include "../include/globalVars.hpp"
 #include <mutex>
 #include <string>
 #include <iostream>
@@ -13,7 +12,7 @@ void msg(const std::string& message) {
 
     // print message
     std::cout << message << '\n';
-    if (playlistMode)  {
+    /*if (playlistMode)  {
         std::cout << "PLAYLIST> " << std::flush;
-    }
+    }*/
 }

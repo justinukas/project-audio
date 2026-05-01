@@ -1,18 +1,18 @@
 #define MINIAUDIO_IMPLEMENTATION
-#include "../include/miniaudio.h"
+#include "../libraries/miniaudio.h"
 #include "../include/commandParsing.hpp"
 #include "../include/commandExecutor.hpp"
-#include "../include/audioPlayer.hpp"
+//#include "../include/audioMaster.hpp"
 
 int main() {
     CommandParser parser;
     Executor executor;
-    AudioPlayer player;
+    //AudioMaster master;
 
     msg("Welcome to project-audio! Type 'help' for commands");
     while(true) {
         Command command = parser.parsedInput();
-        std::string runResult = executor.run(player, command);
+        std::string runResult = "break";//executor.run(master, command);
 
         if (runResult == "continue") {
             continue;
