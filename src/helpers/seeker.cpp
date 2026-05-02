@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../../include/audioMaster.hpp"
 #include "../../include/outputProcessor.hpp"
 
@@ -21,12 +19,12 @@ ma_uint64 Seeker::frameToSeek(std::string strLength, ma_uint32 outputSampleRate)
 	return frame;
 }
 
-void seekFrame(AudioDecoder& decoder, ma_uint64 frame) {
+void Seeker::seekFrame(AudioDecoder& decoder, ma_uint64 frame) {
     //std::lock_guard<std::mutex> lock(audioMutex);
     decoder.seek(frame);
 }
 
-bool syntaxValid(std::string str) {
+bool Seeker::syntaxValid(std::string str) {
 	// valid syntax is mm:ss
 	std::regex validSyntax("^\\d{2}:\\d{2}$");
 

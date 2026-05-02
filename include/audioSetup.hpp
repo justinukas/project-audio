@@ -29,7 +29,7 @@ public:
 	void getElapsedFrames(ma_uint64* frames) { ma_decoder_get_cursor_in_pcm_frames(&decoder, frames); }
 	void getAudioLength(ma_uint64* frames) { ma_decoder_get_length_in_pcm_frames(&decoder, frames); }
 
-	ma_uint64 readFrames(void* pFramesOut, ma_uint64 frameCount) {
+	ma_uint64 readFrames(void* pFramesOut, ma_uint32& frameCount) {
     	return ma_decoder_read_pcm_frames(&decoder, pFramesOut, frameCount, NULL);
 	}
 

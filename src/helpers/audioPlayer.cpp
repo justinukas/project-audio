@@ -88,6 +88,9 @@ bool AudioPlayer::play(AudioDecoder& decoder, AudioDevice& device, SharedAudioSt
     }
 
 	sharedState.soundIsPlaying.store(true);
+    if (sharedState.soundIsPlaying.load() == true) {
+        msg("Sound is playing doe...");
+    }
 
 	msg("Playing...");
 	timeChecker.outputTime("length", decoder, sharedState);

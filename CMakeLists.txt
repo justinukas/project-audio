@@ -14,19 +14,21 @@ project ("ooptest")
 # Add source to this project's executable.
 add_executable (ooptest 
   libraries/miniaudio.h
-  src/main.cpp
+  
+  include/audioMaster.hpp
   include/audioSetup.hpp
+  include/commandExecutor.hpp
   include/commandParsing.hpp
   include/dataCallback.hpp
+  include/outputProcessor.hpp
   include/helpers/audioPlayer.hpp
   include/helpers/seeker.hpp
   include/helpers/timeChecker.hpp
   include/helpers/volumeController.hpp
   include/helpers/playlistMaster.hpp
-  include/outputProcessor.hpp
-  src/outputProcessor.cpp
-  include/commandExecutor.hpp
   src/dataCallback.cpp
+  src/main.cpp
+  src/outputProcessor.cpp  
   src/helpers/audioPlayer.cpp
   src/helpers/seeker.cpp
   src/helpers/timeChecker.cpp

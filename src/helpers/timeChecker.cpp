@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../../libraries/miniaudio.h"
 #include "../../include/helpers/timeChecker.hpp"
 #include "../../include/audioMaster.hpp"
@@ -8,7 +6,7 @@
 #include <string>
 #include <iomanip>
 
-Time timeByType(std::string type, AudioDecoder& decoder) {
+Time TimeChecker::timeByType(std::string type, AudioDecoder& decoder) {
 	//std::lock_guard<std::mutex> lock(audioMutex);
 	int minutes = 0, seconds = 0;
 
@@ -30,7 +28,7 @@ Time timeByType(std::string type, AudioDecoder& decoder) {
 	return { minutes, seconds };
 }
 
-void outputTime(std::string type, AudioDecoder& decoder, SharedAudioState& sharedState) {
+void TimeChecker::outputTime(std::string type, AudioDecoder& decoder, SharedAudioState& sharedState) {
 	if (!sharedState.soundIsPlaying) {
 		msg("Nothing is currently playing");
 		return;

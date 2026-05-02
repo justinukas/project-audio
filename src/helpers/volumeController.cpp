@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../../include/outputProcessor.hpp"
 #include "../../include/helpers/volumeController.hpp"
 #include "../../include/audioMaster.hpp"
