@@ -5,8 +5,6 @@
 #include "../include/audioMaster.hpp"
 #include "../include/outputProcessor.hpp"
 
-#include <iostream>
-
 int main() {
     //std::cout << "i work";
     CommandParser parser;

@@ -32,7 +32,8 @@ add_executable (ooptest
   src/helpers/audioPlayer.cpp
   src/helpers/seeker.cpp
   src/helpers/timeChecker.cpp
-  src/helpers/volumeController.cpp)
+  src/helpers/volumeController.cpp
+  include/helpers/queueManager.hpp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ooptest PROPERTY CXX_STANDARD 20)
