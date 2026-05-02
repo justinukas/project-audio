@@ -14,9 +14,11 @@ struct SharedAudioState {
     std::atomic<double> volumeMultiplier;
     std::atomic<bool> soundIsPlaying;
     std::atomic<bool> playbackFinished;
-    bool paused = false;
+    
 
     // states for playlists/queues
+    // maybe split this off down the line
+    std::atomic<bool> playlistMode;
     std::atomic<bool> stopRequested;
     std::atomic<bool> skipRequested;
 };
@@ -30,17 +32,37 @@ class AudioMaster {
 private:
     AudioDecoder decoder;
     AudioDevice device;
-    SharedAudioState audioState;
-    //AudioPlayer player;
-    //Seeker seeker;
-    //TimeChecker timeChecker;
-    //VolumeController volumeController;
+    SharedAudioState sharedState;
+    AudioPlayer player;
+    Seeker seeker;
+    TimeChecker timeChecker;
+    VolumeController volumeController;
     //PlaylistMaster playlistMaster;
 public:
-    AudioMaster();
+    AudioMaster() : device(this){}
 
-    void cleanup();
-    bool initializeDevice();
+    void cleanup() {       
+        //std::lock_guard<std::mutex> lock(audioMutex);
+  	    if (device.isStarted()) {
+        	device.stop();
+  	    }
+  	    device.uninit();
+  	    decoder.uninit();
+  	    decoder.clearResult();
 
-    SharedAudioState* statePointer() { return &audioState; }
+  	    sharedState.soundIsPlaying.store(false);
+        sharedState.playbackFinished.store(true);
+  	    msg("DEBUG: Cleaned up");
+    }
+    bool initializeDevice() { return device.initialize(decoder); }
+
+    SharedAudioState* statePointer() { return &sharedState; }
+
+    bool initializeFile(std::string userInput) { return player.initializeFile(userInput, decoder, device, [this]() { cleanup(); }); }
+    bool playAudio() { return player.play(decoder, device, sharedState, [this]() { return initializeDevice(); }, seeker, timeChecker); }
+    void pausePlayback() { player.pause(device, sharedState); }
+    void stopPlayback() { player.stop(decoder, sharedState, [this]() { cleanup(); }); }
+    void seek(std::string userInput) { seeker.seek(userInput, decoder, sharedState); }
+    void getTime(std::string timeType) { timeChecker.outputTime(timeType, decoder, sharedState); }
+    void setVolume(std::string userInput) { volumeController.setVolume(userInput, sharedState); }
 };

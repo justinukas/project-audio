@@ -13,22 +13,24 @@ project ("ooptest")
 
 # Add source to this project's executable.
 add_executable (ooptest 
-  "libraries/miniaudio.h" 
-  "src/main.cpp" 
-  "include/audioSetup.hpp" 
-  "include/commandParsing.hpp" 
-  "include/dataCallback.hpp"
-  "include/helpers/audioPlayer.hpp" 
-  "include/helpers/seeker.hpp" 
-  "include/helpers/timeChecker.hpp" 
-  "include/helpers/volumeController.hpp" 
-  "include/helpers/playlistMaster.hpp" 
-  "include/outputProcessor.hpp" 
-  "src/outputProcessor.cpp" 
-  "include/commandExecutor.hpp"
-  #src/audioMaster.cpp
+  libraries/miniaudio.h
+  src/main.cpp
+  include/audioSetup.hpp
+  include/commandParsing.hpp
+  include/dataCallback.hpp
+  include/helpers/audioPlayer.hpp
+  include/helpers/seeker.hpp
+  include/helpers/timeChecker.hpp
+  include/helpers/volumeController.hpp
+  include/helpers/playlistMaster.hpp
+  include/outputProcessor.hpp
+  src/outputProcessor.cpp
+  include/commandExecutor.hpp
   src/dataCallback.cpp
-  src/audioMaster.cpp)
+  src/helpers/audioPlayer.cpp
+  src/helpers/seeker.cpp
+  src/helpers/timeChecker.cpp
+  src/helpers/volumeController.cpp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ooptest PROPERTY CXX_STANDARD 20)

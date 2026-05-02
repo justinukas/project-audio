@@ -1,54 +1,19 @@
-/*#pragma once
+#pragma once
 
-#include "audioMaster.hpp"
-#include "outputProcessor.hpp"
+#include "../outputProcessor.hpp"
+#include "../../libraries/miniaudio.h"
 
 #include <string>
-#include <sstream>
-#include <regex>
+
+class AudioDecoder;
+class SharedAudioState;
 
 class Seeker {
 private:
-    ma_uint64 frameToSeek(std::string strLength, ma_uint32 outputSampleRate) {
-	    int seconds, minutes, totalLengthSeconds;
-	    char colon;
-	    ma_uint64 frame;
-
-	    std::istringstream iss(strLength);
-	    iss >> minutes >> colon >> seconds;
-
-	    totalLengthSeconds = minutes * 60 + seconds;
-
-	    frame = static_cast<ma_uint64>(totalLengthSeconds * outputSampleRate);
-	    return frame;
-    }
-
-    void seekFrame(AudioDecoder& decoder, ma_uint64 frame) {
-        //std::lock_guard<std::mutex> lock(audioMutex);
-        decoder.seek(frame);
-    }
-
-	bool syntaxValid(std::string str) {
-		// valid syntax is mm:ss
-	    std::regex validSyntax("^\\d{2}:\\d{2}$");
-
-		if (!std::regex_match(str, validSyntax)) {
-	    	msg("Invalid syntax");
-	    	return false;
-	    }
-		else return true;
-	}
+    ma_uint64 frameToSeek(std::string strLength, ma_uint32 outputSampleRate);
+    void seekFrame(AudioDecoder& decoder, ma_uint64 frame);
+	bool syntaxValid(std::string str);
 
 public:
-    void seek(std::string timeToSeek, AudioDecoder& decoder) {
-	    if (!soundIsPlaying) {
-	    	msg("Nothing is currently playing");
-	    	return;
-	    }
-
-		syntaxValid(timeToSeek);
-
-	    seekFrame(decoder, frameToSeek(timeToSeek, decoder.getSampleRate()));
-    }
+    void seek(std::string timeToSeek, AudioDecoder& decoder, SharedAudioState& sharedState);
 };
-*/

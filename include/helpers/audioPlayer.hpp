@@ -1,122 +1,22 @@
-/*#pragma once
-
-#include "outputProcessor.hpp"
+#pragma once
 
 #include <string>
-#include <atomic>
+#include <functional>
+
+#include "seeker.hpp"
+
+class AudioDecoder;
+class AudioDevice;
+class SharedAudioState;
+class TimeChecker;
 
 class AudioPlayer {
 private:
-    
-public:    
-	bool initializeFile(std::string songPath) {
-  	    if (songPath.empty()) {
-            msg("No file path provided");
-            return false;
-  	    }
+	bool paused = false;
 
-	    // if not clean
-	    if (decoder.getResult() == MA_SUCCESS) {
-       	    master->cleanup();
-        }
-
-        fs::path path(songPath);
-        if (!fs::exists(songPath)) {
-	  	    msg("Path does not exist");
-       	    return false;
-        }
-
-        if (!fs::is_regular_file(path)) {
-       	    msg("Path is not a file");
-       	    return false;
-        }
-
-        const char* audioPath = songPath.c_str();
-        decoder.setResult(decoder.initFile(audioPath));
-
-        if (decoder.getResult() != MA_SUCCESS) {
-		    std::ostringstream oss;
-		    oss << "Could not load file: \"" << audioPath << '\"';
-		    msg(oss.str());
-       	    return false;
-        }
-
-	    std::ostringstream oss;
-	    oss << "File " << audioPath << " loaded succesfully!";
-	    msg(oss.str());
-
-	    return true;
-    }
-    bool play() {
-	    if (decoder.getResult() != MA_SUCCESS) {
-		    msg("Please load a file using 'load <file_path>' first!");
-		    return false;
-	    }
-
-	    if (!soundIsPlaying && playbackFinished) {
-		    msg("Please load a new file");
-		    return false;
-	    }
-
-	    // resume if paused
-	    if (paused) {
-		    device.start();
-		    paused = false;
-		    //return false;
-	    }
-
-	    const std::string audioStartTime = "00:00";
-	    // start from the beginning if something is already playing
-	    if (soundIsPlaying) {
-		    seeker.seek(audioStartTime, decoder);
-		    return false;
-	    }
-
-	    //AudioPlayer::play(): * Calls Device.init(decoder, this).
-
-	    //Inside that init, the Device calls its own configuration() helper using the decoder's info.
-
-	    //Calls Device.start().
-        if (!device.initialize(configuration())) {
-            msg("Failed to open playback device");
-		    decoder.uninit();
-		    return false;
-        }
-
-        if (!device.start()) {
-            msg("Failed to start playback device");
-		    device.uninit();
-		    decoder.uninit();
-		    return false;
-        }
-
-	    soundIsPlaying = true;
-
-	    msg("Playing...");
-	    timeChecker.outputTime("length", decoder);
-
-	    return true;
-    }
-    void stop() {
-        if (!soundIsPlaying) {
-            msg("Nothing is playing");
-		    return;
-	    }
-	    if (decoder.getResult() != MA_ERROR) {
-		    cleanup();
-	    }
-
-	    stopRequested = true;
-        msg("Stopped playback");
-    }
-    void pause() {
-        if (!soundIsPlaying) {
-            msg("Nothing is playing");
-		    return;
-	    }
-	    device.stop();
-	    paused = true;
-        msg("Paused playback");
-    }
+public:
+	bool initializeFile(std::string songPath, AudioDecoder& decoder, AudioDevice& device, std::function<void()> cleanup);
+    bool play(AudioDecoder& decoder, AudioDevice& device, SharedAudioState& sharedState, std::function<bool()> initializeDevice, Seeker seeker, TimeChecker timeChecker);
+    void pause(AudioDevice& device, SharedAudioState& sharedState);
+	void stop(AudioDecoder& decoder, SharedAudioState& sharedState, std::function<void()> cleanup);
 };
-*/

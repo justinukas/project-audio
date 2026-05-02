@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "audioMaster.hpp"
+#include "audioMaster.hpp"
 #include "commandParsing.hpp"
 #include <thread>
 
@@ -32,32 +32,32 @@ private:
         msg(oss.str());
     }
 public:
-    /*std::string run(AudioMaster& master, const Command& cmnd) {
+    std::string run(AudioMaster& master, const Command& cmnd) {
         // do a while loop so that the user can always input a command
         if (cmnd.type == "help") outputHelp();
         else if (cmnd.type == "load") {
-            if (playlistMode) {
+            /*if (playlistMode) {
                 msg("Please exit playlist mode first.");
                 return "continue";
-            }
-            player.initializeFile(cmnd.parameter1); 
+            }*/
+            master.initializeFile(cmnd.parameter1); 
         }
-        else if (cmnd.type == "play" && !playlistMode) master.play();
-        else if (cmnd.type == "pause") master.pause();
-        else if (cmnd.type == "stop") master.stop();
+        else if (cmnd.type == "play" /*&& !playlistMode*/) master.playAudio();
+        else if (cmnd.type == "pause") master.pausePlayback();
+        else if (cmnd.type == "stop") master.stopPlayback();
         else if (cmnd.type == "seek") master.seek(cmnd.parameter1);
         else if (cmnd.type == "volume") master.setVolume(cmnd.parameter1);
-        else if (cmnd.type == "elapsed") master.getElapsedTime();
-        else if (cmnd.type == "length") master.getSongLength();
+        else if (cmnd.type == "elapsed" || cmnd.type == "length") master.getTime(cmnd.type);
 
+        /*
         else if (cmnd.type == "playlist") { playlistMode = true; std::cout << "PLAYLIST> "; }
         else if (cmnd.type == "make" && playlistMode) master.makePlaylist(cmnd.parameter1);
         else if (cmnd.type == "play" && playlistMode) std::thread(&AudioPlayer::playPlaylist, &master, cmnd.parameter1).detach();
-        else if (cmnd.type == "skip") player.skipPlaylistSong();
+        else if (cmnd.type == "skip") master..skipPlaylistSong();
 
-        else if (cmnd.type == "exit" && playlistMode) playlistMode = false; 
-        else if (cmnd.type == "exit" && !playlistMode) return "break";
+        else if (cmnd.type == "exit" && playlistMode) playlistMode = false; */
+        else if (cmnd.type == "exit" /*&& !playlistMode*/) return "break";
         else msg("Unknown command. Type 'help' for available commands");
         return "";
-    }*/
+    }
 };
