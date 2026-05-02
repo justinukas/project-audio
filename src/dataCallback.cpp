@@ -2,8 +2,10 @@
 #include "../include/outputProcessor.hpp"
 #include "../include/audioMaster.hpp"
 
+#include <mutex>
+
 void DataCallback::checkEndOfPlayback(ma_uint64 framesRead, ma_uint64 frameCount, AudioMaster* master) {
-    if (framesRead > frameCount) {
+    if (framesRead < frameCount) {
 			
 		master->statePointer()->soundIsPlaying.store(false);
 		master->statePointer()->playbackFinished.store(true);
@@ -26,20 +28,20 @@ void DataCallback::applyVolume(ma_uint64 frameCount, void* pFramesOut, ma_decode
 }
 
 void DataCallback::dataCallback(ma_device* pDevice, void* pFramesOut, const void* pInput, ma_uint32 frameCount) {
+	//std::mutex audioMutex;
 	//std::lock_guard<std::mutex> lock(audioMutex);
 
-	//ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
 	AudioMaster* master = static_cast<AudioMaster*>(pDevice->pUserData); 
 	ma_decoder* decoder = master->decoder.decoderPointer();
-	if (decoder == NULL /*|| master->statePointer()->soundIsPlaying.load() == false*/) {
+	if (decoder == NULL || master->statePointer()->soundIsPlaying.load() == false) {
 		return;
 	}
 
-	ma_uint64 framesRead = 0;
-	framesRead = ma_decoder_read_pcm_frames(decoder, pFramesOut, frameCount, NULL);
+	ma_uint64 framesRead = 0; //master->decoder.readFrames(pFramesOut, frameCount, &framesRead);
+	ma_decoder_read_pcm_frames(decoder, pFramesOut, frameCount, &framesRead);
 	msg(std::to_string(frameCount));
 	msg(std::to_string(framesRead));
 
 	checkEndOfPlayback(framesRead, frameCount, master);
-	//applyVolume(frameCount, pFramesOut, decoder, master->volumeController.currentVolume());
+	applyVolume(frameCount, pFramesOut, decoder, master->volumeController.currentVolume(*master->statePointer()));
 }

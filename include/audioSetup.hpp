@@ -29,10 +29,6 @@ public:
 	void getElapsedFrames(ma_uint64* frames) { ma_decoder_get_cursor_in_pcm_frames(&decoder, frames); }
 	void getAudioLength(ma_uint64* frames) { ma_decoder_get_length_in_pcm_frames(&decoder, frames); }
 
-	ma_uint64 readFrames(void* pFramesOut, ma_uint32& frameCount) {
-    	return ma_decoder_read_pcm_frames(&decoder, pFramesOut, frameCount, NULL);
-	}
-
 	ma_decoder* decoderPointer() { return &decoder; }
 };
 
@@ -57,7 +53,7 @@ public:
 	}
   	void stop() { ma_device_stop(&device); }
 	
-	bool initialize(AudioDecoder decoder) {
+	bool initialize(AudioDecoder& decoder) {
 		ma_device_config config = ma_device_config_init(ma_device_type_playback);
     	config.playback.format = decoder.getFormat();
     	config.playback.channels = decoder.getChannels();
