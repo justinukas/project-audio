@@ -15,7 +15,7 @@ private:
 	bool paused = false;
 
 public:
-	bool initializeFile(std::string songPath, AudioDecoder& decoder, AudioDevice& device, std::function<void()> cleanup);
+	bool initializeFile(std::string songPath, AudioDecoder& decoder, AudioDevice& device, std::function<void()> cleanup, SharedAudioState& sharedState);
     bool play(AudioDecoder& decoder, AudioDevice& device, SharedAudioState& sharedState, std::function<bool()> initializeDevice, Seeker seeker, TimeChecker timeChecker);
     void pause(AudioDevice& device, SharedAudioState& sharedState);
 	void stop(AudioDecoder& decoder, SharedAudioState& sharedState, std::function<void()> cleanup);

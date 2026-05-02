@@ -5,7 +5,7 @@
 
 namespace fs = std::filesystem;
 
-bool AudioPlayer::initializeFile(std::string songPath, AudioDecoder& decoder, AudioDevice& device, std::function<void()> cleanup) {
+bool AudioPlayer::initializeFile(std::string songPath, AudioDecoder& decoder, AudioDevice& device, std::function<void()> cleanup, SharedAudioState& sharedState) {
   	if (songPath.empty()) {
         msg("No file path provided");
         return false;
@@ -37,6 +37,11 @@ bool AudioPlayer::initializeFile(std::string songPath, AudioDecoder& decoder, Au
        	return false;
     }
 
+	// get the audio length early
+	ma_uint64 totalFrames = 0;
+	decoder.getAudioLength(&totalFrames);
+	sharedState.totalFrames.store(totalFrames);
+
 	std::ostringstream oss;
 	oss << "File " << audioPath << " loaded succesfully!";
 	msg(oss.str());
@@ -47,11 +52,6 @@ bool AudioPlayer::initializeFile(std::string songPath, AudioDecoder& decoder, Au
 bool AudioPlayer::play(AudioDecoder& decoder, AudioDevice& device, SharedAudioState& sharedState, std::function<bool()> initializeDevice, Seeker seeker, TimeChecker timeChecker) {
 	if (decoder.getResult() != MA_SUCCESS) {
 		msg("Please load a file using 'load <file_path>' first!");
-		    return false;
-	}
-
-	if (!sharedState.soundIsPlaying && sharedState.playbackFinished) {
-		msg("Please load a new file");
 		return false;
 	}
 
@@ -59,21 +59,23 @@ bool AudioPlayer::play(AudioDecoder& decoder, AudioDevice& device, SharedAudioSt
 	if (paused) {
 		device.start();
 		paused = false;
-		//return false;
+		msg("Resuming...");
+		return true;
 	}
 
 	const std::string audioStartTime = "00:00";
 	// start from the beginning if something is already playing
-	if (sharedState.soundIsPlaying) {
+	if (sharedState.soundIsPlaying.load()) {
+		msg("Already playing. Restarting track...");
 		seeker.seek(audioStartTime, decoder, sharedState);
-		return false;
+		return true;
 	}
 
-	    //AudioPlayer::play(): * Calls Device.init(decoder, this).
+	//AudioPlayer::play(): * Calls Device.init(decoder, this).
 
-	    //Inside that init, the Device calls its own configuration() helper using the decoder's info.
+	//Inside that init, the Device calls its own configuration() helper using the decoder's info.
 
-	    //Calls Device.start().
+	//Calls Device.start().
     if (!initializeDevice()) {
         msg("Failed to open playback device");
 		decoder.uninit();
@@ -88,9 +90,6 @@ bool AudioPlayer::play(AudioDecoder& decoder, AudioDevice& device, SharedAudioSt
     }
 
 	sharedState.soundIsPlaying.store(true);
-    if (sharedState.soundIsPlaying.load() == true) {
-        msg("Sound is playing doe...");
-    }
 
 	msg("Playing...");
 	timeChecker.outputTime("length", decoder, sharedState);

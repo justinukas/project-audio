@@ -15,7 +15,7 @@ struct Time {
 
 class TimeChecker {
 private:
-	Time timeByType(std::string type, AudioDecoder& decoder);
+	Time timeByType(const std::string& type, AudioDecoder& decoder, const SharedAudioState& sharedState);
 public:
-	void outputTime(std::string type, AudioDecoder& decoder, SharedAudioState& sharedState);
+	void outputTime(const std::string& type, AudioDecoder& decoder, const SharedAudioState& sharedState);
 };

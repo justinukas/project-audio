@@ -11,16 +11,20 @@
 
 struct SharedAudioState {
     // states for everything
-    std::atomic<double> volumeMultiplier;
+    std::atomic<double> volumeMultiplier{0.5};
     std::atomic<bool> soundIsPlaying;
     std::atomic<bool> playbackFinished;
-    
+
+    // frame related
+    std::atomic<ma_uint64> currentFrame{0};
+    std::atomic<ma_uint64> totalFrames{0};
+    std::atomic<bool> seeking{false};
 
     // states for playlists/queues
     // maybe split this off down the line
-    std::atomic<bool> playlistMode;
-    std::atomic<bool> stopRequested;
-    std::atomic<bool> skipRequested;
+    std::atomic<bool> playlistMode{false};
+    std::atomic<bool> stopRequested{false};
+    std::atomic<bool> skipRequested{false};
 };
 
 
@@ -58,7 +62,7 @@ public:
 
     SharedAudioState* statePointer() { return &sharedState; }
 
-    bool initializeFile(std::string userInput) { return player.initializeFile(userInput, decoder, device, [this]() { cleanup(); }); }
+    bool initializeFile(std::string userInput) { return player.initializeFile(userInput, decoder, device, [this]() { cleanup(); }, sharedState); }
     bool playAudio() { return player.play(decoder, device, sharedState, [this]() { return initializeDevice(); }, seeker, timeChecker); }
     void pausePlayback() { player.pause(device, sharedState); }
     void stopPlayback() { player.stop(decoder, sharedState, [this]() { cleanup(); }); }

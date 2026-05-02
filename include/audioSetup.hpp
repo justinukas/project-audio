@@ -25,8 +25,8 @@ public:
 	ma_uint32 getSampleRate() { return decoder.outputSampleRate; }
 
 	// Frame related
-	void seek(ma_uint64 frame) { ma_decoder_seek_to_pcm_frame(&decoder, frame); }
-	void getElapsedFrames(ma_uint64* frames) { ma_decoder_get_cursor_in_pcm_frames(&decoder, frames); }
+	ma_result seek(ma_uint64 frame) { return ma_decoder_seek_to_pcm_frame(&decoder, frame); }
+	//void getElapsedFrames(ma_uint64* frames) { ma_decoder_get_cursor_in_pcm_frames(&decoder, frames); }
 	void getAudioLength(ma_uint64* frames) { ma_decoder_get_length_in_pcm_frames(&decoder, frames); }
 
 	ma_decoder* decoderPointer() { return &decoder; }

@@ -6,16 +6,15 @@
 #include <string>
 #include <iomanip>
 
-Time TimeChecker::timeByType(std::string type, AudioDecoder& decoder) {
-	//std::lock_guard<std::mutex> lock(audioMutex);
+Time TimeChecker::timeByType(const std::string& type, AudioDecoder& decoder, const SharedAudioState& sharedState) {
 	int minutes = 0, seconds = 0;
 
 	ma_uint64 frames = 0;
 	if (type == "elapsed") {
-   	    decoder.getElapsedFrames(&frames);
+   	    frames = sharedState.currentFrame.load();
 	}
 	else if (type == "length") {
-		decoder.getAudioLength(&frames);
+		frames = sharedState.totalFrames.load();
 	}
 
 	// convert frames to seconds
@@ -28,17 +27,20 @@ Time TimeChecker::timeByType(std::string type, AudioDecoder& decoder) {
 	return { minutes, seconds };
 }
 
-void TimeChecker::outputTime(std::string type, AudioDecoder& decoder, SharedAudioState& sharedState) {
+void TimeChecker::outputTime(const std::string& type, AudioDecoder& decoder, const SharedAudioState& sharedState) {
 	if (!sharedState.soundIsPlaying) {
 		msg("Nothing is currently playing");
 		return;
 	}
 
-	Time timeToOutput = timeByType(type, decoder);
+	Time timeToOutput = timeByType(type, decoder, sharedState);
 	std::ostringstream oss;
 	if (type == "length") {
 		oss << "Song length: ";
 	}
-	oss << '[' << std::setfill('0') << std::setw(2) << timeToOutput.minutes << ':' << std::setfill('0') << std::setw(2) << timeToOutput.seconds << ']' << '\n';
+	else if (type == "elapsed") {
+		oss << "Elapsed: ";
+	}
+	oss << '[' << std::setfill('0') << std::setw(2) << timeToOutput.minutes << ':' << std::setfill('0') << std::setw(2) << timeToOutput.seconds << ']';
 	msg(oss.str());
 }

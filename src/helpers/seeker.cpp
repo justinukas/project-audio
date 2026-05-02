@@ -19,9 +19,12 @@ ma_uint64 Seeker::frameToSeek(std::string strLength, ma_uint32 outputSampleRate)
 	return frame;
 }
 
-void Seeker::seekFrame(AudioDecoder& decoder, ma_uint64 frame) {
-    //std::lock_guard<std::mutex> lock(audioMutex);
-    decoder.seek(frame);
+void Seeker::seekFrame(ma_uint64 frame, AudioDecoder& decoder, SharedAudioState& sharedState) {
+	sharedState.seeking.store(true);
+	if (decoder.seek(frame) == MA_SUCCESS) {
+		sharedState.currentFrame.store(frame);
+	}
+	sharedState.seeking.store(false);
 }
 
 bool Seeker::syntaxValid(std::string str) {
@@ -29,7 +32,6 @@ bool Seeker::syntaxValid(std::string str) {
 	std::regex validSyntax("^\\d{2}:\\d{2}$");
 
 	if (!std::regex_match(str, validSyntax)) {
-	    msg("Invalid syntax");
 	    return false;
 	}
 	else return true;
@@ -41,7 +43,10 @@ void Seeker::seek(std::string timeToSeek, AudioDecoder& decoder, SharedAudioStat
 	    return;
 	}
 
-	syntaxValid(timeToSeek);
+	if (!syntaxValid(timeToSeek)) {
+		msg("Invalid syntax");
+		return;
+	}
 
-	seekFrame(decoder, frameToSeek(timeToSeek, decoder.getSampleRate()));
+	seekFrame(frameToSeek(timeToSeek, decoder.getSampleRate()), decoder, sharedState);
 }

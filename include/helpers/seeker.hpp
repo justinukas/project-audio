@@ -11,7 +11,7 @@ class SharedAudioState;
 class Seeker {
 private:
     ma_uint64 frameToSeek(std::string strLength, ma_uint32 outputSampleRate);
-    void seekFrame(AudioDecoder& decoder, ma_uint64 frame);
+    void seekFrame(ma_uint64 frame, AudioDecoder& decoder, SharedAudioState& sharedState);
 	bool syntaxValid(std::string str);
 
 public:
