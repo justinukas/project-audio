@@ -31,23 +31,54 @@ private:
         ;
         msg(oss.str());
     }
+
+    int stringToInt(const std::string& param) {
+        try {
+            return std::stoi(param);
+        }
+        catch (...) {
+            return false;
+        }
+    }
 public:
-    std::string run(AudioMaster& master, const Command& cmnd) {
+    std::string run(AudioMaster& master, SharedAudioState& sharedState, const Command& cmnd) {
         // do a while loop so that the user can always input a command
         if (cmnd.type == "help") outputHelp();
         else if (cmnd.type == "load") {
-            /*if (playlistMode) {
-                msg("Please exit playlist mode first.");
+            if (sharedState.queueMode.load()) {
+                msg("Please exit queue mode first.");
                 return "continue";
-            }*/
+            }
             master.initializeFile(cmnd.parameter1); 
         }
-        else if (cmnd.type == "play" /*&& !playlistMode*/) master.playAudio();
+        else if (cmnd.type == "play" /*&& !playlistMode*/) master.playSong();
         else if (cmnd.type == "pause") master.pausePlayback();
         else if (cmnd.type == "stop") master.stopPlayback();
         else if (cmnd.type == "seek") master.seek(cmnd.parameter1);
         else if (cmnd.type == "volume") master.setVolume(cmnd.parameter1);
         else if (cmnd.type == "elapsed" || cmnd.type == "length") master.getTime(cmnd.type);
+
+        else if (cmnd.type == "queue") {
+            if (cmnd.parameter1 == "add") {
+                master.addToQueue(cmnd.parameter2);
+            }
+            else if (cmnd.parameter1 == "remove") {
+                int index = stringToInt(cmnd.parameter2);
+                master.removeFromQueue(index);
+            }
+            else if (cmnd.parameter1 == "play") {
+                std::thread(&AudioMaster::playQueue, &master).detach();
+            }
+            else if (cmnd.parameter1 == "next") {
+                master.nextSong();
+            }
+            else if (cmnd.parameter1 == "back") {
+                master.previousSong();
+            }
+            else if (cmnd.parameter1 == "list") {
+                master.listQueue();
+            }
+        }
 
         /*
         else if (cmnd.type == "playlist") { playlistMode = true; std::cout << "PLAYLIST> "; }

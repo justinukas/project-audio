@@ -15,7 +15,7 @@ int main() {
     msg("Welcome to project-audio! Type 'help' for commands");
     while(true) {
         Command command = parser.parsedInput();
-        std::string runResult = executor.run(master, command);
+        std::string runResult = executor.run(master, *master.statePointer(), command);
 
         if (runResult == "continue") {
             continue;

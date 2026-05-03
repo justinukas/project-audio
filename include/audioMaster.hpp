@@ -6,6 +6,7 @@
 #include "helpers/timeChecker.hpp"
 #include "helpers/volumeController.hpp"
 #include "helpers/playlistMaster.hpp"
+#include "helpers/queueMaster.hpp"
 #include "outputProcessor.hpp"
 #include <atomic>
 
@@ -22,11 +23,9 @@ struct SharedAudioState {
 
     // states for playlists/queues
     // maybe split this off down the line
-    std::atomic<bool> playlistMode{false};
+    std::atomic<bool> queueMode{false};
     std::atomic<bool> stopRequested{false};
-    std::atomic<bool> skipRequested{false};
 };
-
 
 class AudioDevice;
 class AudioDecoder;
@@ -41,6 +40,8 @@ private:
     Seeker seeker;
     TimeChecker timeChecker;
     VolumeController volumeController;
+
+    QueueMaster queueMaster;
     //PlaylistMaster playlistMaster;
 public:
     AudioMaster() : device(this){}
@@ -62,11 +63,21 @@ public:
 
     SharedAudioState* statePointer() { return &sharedState; }
 
-    bool initializeFile(std::string userInput) { return player.initializeFile(userInput, decoder, device, [this]() { cleanup(); }, sharedState); }
-    bool playAudio() { return player.play(decoder, device, sharedState, [this]() { return initializeDevice(); }, seeker, timeChecker); }
+    // BASIC FUNCTIONS
+    bool initializeFile(const fs::path& songPath) { return player.initializeFile(songPath, decoder, device, [this]() { cleanup(); }, sharedState); }
+    bool playSong() { return player.play(decoder, device, sharedState, [this]() { return initializeDevice(); }, seeker, timeChecker); }
     void pausePlayback() { player.pause(device, sharedState); }
     void stopPlayback() { player.stop(decoder, sharedState, [this]() { cleanup(); }); }
     void seek(std::string userInput) { seeker.seek(userInput, decoder, sharedState); }
     void getTime(std::string timeType) { timeChecker.outputTime(timeType, decoder, sharedState); }
     void setVolume(std::string userInput) { volumeController.setVolume(userInput, sharedState); }
+
+
+    // QUEUE FUNCTIONS
+    void addToQueue(const fs::path& songPath) { queueMaster.addToQueue(songPath); }
+    void removeFromQueue(const int& index) { queueMaster.removeFromQueue(index); }
+    void playQueue() { queueMaster.playQueue(*this, sharedState, decoder); }
+    void listQueue() { queueMaster.listQueue(); }
+    void nextSong() { queueMaster.playNextTrack(sharedState); }
+    void previousSong() { queueMaster.playPreviousTrack(); }
 };

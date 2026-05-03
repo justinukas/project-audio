@@ -70,12 +70,7 @@ bool AudioPlayer::play(AudioDecoder& decoder, AudioDevice& device, SharedAudioSt
 		seeker.seek(audioStartTime, decoder, sharedState);
 		return true;
 	}
-
-	//AudioPlayer::play(): * Calls Device.init(decoder, this).
-
-	//Inside that init, the Device calls its own configuration() helper using the decoder's info.
-
-	//Calls Device.start().
+	
     if (!initializeDevice()) {
         msg("Failed to open playback device");
 		decoder.uninit();
