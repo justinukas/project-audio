@@ -9,6 +9,7 @@ struct Command {
     std::string type;
     std::string parameter1;
     std::string parameter2;
+	std::string parameter3;
 };
 
 class CommandParser {
@@ -36,12 +37,17 @@ public:
 			std::getline(iss, command.parameter1);
 		}
 		else { std::getline(iss, command.parameter1, ' '); }
-	
-    	std::getline(iss, command.parameter2);
+
+		if (command.type == "queue" && (command.parameter1 == "add" || command.parameter1 == "save" || command.parameter1 == "read")) {
+			std::getline(iss, command.parameter2);
+		}
+		else { std::getline(iss, command.parameter2, ' '); }
+		std::getline(iss, command.parameter3);
 
     	// strip quotes and apostrophes in case the parameters are paths
     	stripQuotesApostrophes(command.parameter1);
     	stripQuotesApostrophes(command.parameter2);
+		stripQuotesApostrophes(command.parameter3);
 
 	    return command;
     }

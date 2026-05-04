@@ -60,11 +60,28 @@ public:
 
         else if (cmnd.type == "queue") {
             if (cmnd.parameter1 == "add") {
-                master.addToQueue(cmnd.parameter2);
+                master.addSongToQueue(cmnd.parameter2);
             }
             else if (cmnd.parameter1 == "remove") {
-                int index = stringToInt(cmnd.parameter2);
-                master.removeFromQueue(index);
+                int position = stringToInt(cmnd.parameter2);
+                master.removeSongFromQueue(position);
+            }
+            else if (cmnd.parameter1 == "shuffle") {
+                master.shuffleQueue();
+            }
+            else if (cmnd.parameter1 == "move") {
+                int oldPos = stringToInt(cmnd.parameter2);
+                int newPos = stringToInt(cmnd.parameter3);
+                master.moveQueueSong(oldPos, newPos);
+            }
+            else if (cmnd.parameter1 == "list") {
+                master.listQueue();
+            }
+            else if (cmnd.parameter1 == "save") {
+                master.saveQueueAsFile(cmnd.parameter2);
+            }
+            else if (cmnd.parameter1 == "read") {
+                master.readQueueFromFile(cmnd.parameter2);
             }
             else if (cmnd.parameter1 == "play") {
                 std::thread(&AudioMaster::playQueue, &master).detach();
@@ -75,19 +92,12 @@ public:
             else if (cmnd.parameter1 == "back") {
                 master.previousSong();
             }
-            else if (cmnd.parameter1 == "list") {
-                master.listQueue();
+            else if (cmnd.parameter1 == "select") {
+                int pos = stringToInt(cmnd.parameter2);
+                master.selectQueueSong(pos);
             }
         }
-
-        /*
-        else if (cmnd.type == "playlist") { playlistMode = true; std::cout << "PLAYLIST> "; }
-        else if (cmnd.type == "make" && playlistMode) master.makePlaylist(cmnd.parameter1);
-        else if (cmnd.type == "play" && playlistMode) std::thread(&AudioPlayer::playPlaylist, &master, cmnd.parameter1).detach();
-        else if (cmnd.type == "skip") master..skipPlaylistSong();
-
-        else if (cmnd.type == "exit" && playlistMode) playlistMode = false; */
-        else if (cmnd.type == "exit" /*&& !playlistMode*/) return "break";
+        else if (cmnd.type == "exit") return "break";
         else msg("Unknown command. Type 'help' for available commands");
         return "";
     }

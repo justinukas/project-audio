@@ -1,0 +1,7 @@
+0 "/home/justinukas/Git Projects/project-audio/playlist test/[Eve] Ghost Avenue.mp3"
+2 /home/justinukas/Git Projects/project-audio/playlist test/[amazarashi Official YouTu] kyoukaisen.mp3
+4 /home/justinukas/Git Projects/project-audio/playlist test/[NA] Burn My Dread.mp3
+8 /home/justinukas/Git Projects/project-audio/playlist test/YOURE A DEAD MAN.mp3
+54 /home/justinukas/Git Projects/project-audio/playlist test/YOURE A DEAD MAN.mp3
+100 /home/justinukas/Git Projects/project-audio/playlist test/[amazarashi Official YouTu] kyoukaisen.mp3
+1233 /home/justinukas/Git Projects/project-audio/playlist test/[ALEXANDROSchannel] todayyyyy.mp3

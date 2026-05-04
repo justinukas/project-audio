@@ -74,10 +74,16 @@ public:
 
 
     // QUEUE FUNCTIONS
-    void addToQueue(const fs::path& songPath) { queueMaster.addToQueue(songPath); }
-    void removeFromQueue(const int& index) { queueMaster.removeFromQueue(index); }
-    void playQueue() { queueMaster.playQueue(*this, sharedState, decoder); }
+    void addSongToQueue(const fs::path& songPath) { queueMaster.addToQueue(songPath); }
+    void removeSongFromQueue(const int& index) { queueMaster.removeFromQueue(index); }
+    void shuffleQueue() { queueMaster.shuffleQueue(); }
+    void moveQueueSong(const int& oldPosition, const int& newPosition) { queueMaster.moveSong(oldPosition, newPosition); }
+    void saveQueueAsFile(const fs::path& destination) { queueMaster.saveAsFile(destination); }
+    void readQueueFromFile(const fs::path& path) { queueMaster.readFromFile(path); }
     void listQueue() { queueMaster.listQueue(); }
+
+    void playQueue() { queueMaster.playQueue(*this, sharedState, decoder); } // call this in a thread
     void nextSong() { queueMaster.playNextTrack(sharedState); }
     void previousSong() { queueMaster.playPreviousTrack(); }
+    void selectQueueSong(const int& position) { queueMaster.selectQueueSong(position); }
 };
