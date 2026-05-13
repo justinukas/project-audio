@@ -33,6 +33,9 @@ class AudioDecoder;
 class AudioMaster {
     friend class DataCallback;
 private:
+    // possibly add destructors for audiodecoder and audiodevice
+    // so that the connections to audio devices or files on the drive would cleanly be severed
+
     AudioDecoder decoder;
     AudioDevice device;
     SharedAudioState sharedState;
