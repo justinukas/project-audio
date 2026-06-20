@@ -6,12 +6,10 @@
 #include "../include/outputProcessor.hpp"
 
 int main() {
-    //std::cout << "i work";
     CommandParser parser;
     Executor executor;
     AudioMaster master;
 
-    //std::cout << "i work";
     msg("Welcome to project-audio! Type 'help' for commands");
     while(true) {
         Command command = parser.parsedInput();

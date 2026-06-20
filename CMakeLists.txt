@@ -25,7 +25,6 @@ add_executable (ooptest
   include/helpers/seeker.hpp
   include/helpers/timeChecker.hpp
   include/helpers/volumeController.hpp
-  include/helpers/playlistMaster.hpp
   include/helpers/queueMaster.hpp
   src/dataCallback.cpp
   src/main.cpp

@@ -5,7 +5,6 @@
 #include "helpers/seeker.hpp"
 #include "helpers/timeChecker.hpp"
 #include "helpers/volumeController.hpp"
-#include "helpers/playlistMaster.hpp"
 #include "helpers/queueMaster.hpp"
 #include "outputProcessor.hpp"
 #include <atomic>
@@ -23,7 +22,7 @@ struct SharedAudioState {
 
     // states for playlists/queues
     // maybe split this off down the line
-    std::atomic<bool> queueMode{false};
+    std::atomic<bool> queueMode{false}; // not used yet
     std::atomic<bool> stopRequested{false};
 };
 
@@ -33,9 +32,6 @@ class AudioDecoder;
 class AudioMaster {
     friend class DataCallback;
 private:
-    // possibly add destructors for audiodecoder and audiodevice
-    // so that the connections to audio devices or files on the drive would cleanly be severed
-
     AudioDecoder decoder;
     AudioDevice device;
     SharedAudioState sharedState;
@@ -45,12 +41,10 @@ private:
     VolumeController volumeController;
 
     QueueMaster queueMaster;
-    //PlaylistMaster playlistMaster;
 public:
     AudioMaster() : device(this){}
 
     void cleanup() {       
-        //std::lock_guard<std::mutex> lock(audioMutex);
   	    if (device.isStarted()) {
         	device.stop();
   	    }

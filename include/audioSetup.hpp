@@ -9,10 +9,22 @@ private:
   	ma_decoder decoder;
   	ma_result result = MA_ERROR;
 
+	bool initialized;
+
 public:
 	// Initialization
-  	void uninit() { ma_decoder_uninit(&decoder); }
-	ma_result initFile(const char* file) { return ma_decoder_init_file(file, NULL, &decoder); }
+  	void uninit() {
+		if (ma_decoder_uninit(&decoder) == MA_SUCCESS) {
+			initialized = false;
+		}
+	}
+	ma_result initFile(const char* file) {
+		if (ma_decoder_init_file(file, NULL, &decoder) == MA_SUCCESS) {
+			initialized = true;
+			return MA_SUCCESS;
+		}
+		else return MA_ERROR;
+	}
 
 	// Results
 	ma_result getResult() { return result; }
@@ -26,10 +38,15 @@ public:
 
 	// Frame related
 	ma_result seek(ma_uint64 frame) { return ma_decoder_seek_to_pcm_frame(&decoder, frame); }
-	//void getElapsedFrames(ma_uint64* frames) { ma_decoder_get_cursor_in_pcm_frames(&decoder, frames); }
 	void getAudioLength(ma_uint64* frames) { ma_decoder_get_length_in_pcm_frames(&decoder, frames); }
 
 	ma_decoder* decoderPointer() { return &decoder; }
+
+	~AudioDecoder() {
+		if (initialized) {
+			uninit();
+		}
+	}
 };
 
 class AudioMaster;
@@ -40,6 +57,8 @@ private:
 
 	ma_device device;
 	DataCallback dataCallback;
+
+	bool initialized;
 public:
 	AudioDevice(AudioMaster* m) : master(m){}
 
@@ -62,9 +81,19 @@ public:
     	config.pUserData = master;
 
 		if (ma_device_init(NULL, &config, &device) == MA_SUCCESS) {
+			initialized = true;
 			return true;
 		}
 		else { return false; }
 	}
-  	void uninit() { ma_device_uninit(&device); }
+  	void uninit() {
+		initialized = false;
+		ma_device_uninit(&device);
+	}
+
+	~AudioDevice() {
+		if (initialized) {
+			uninit();
+		}
+	}
 };

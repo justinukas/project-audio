@@ -49,7 +49,7 @@ void QueueMaster::shuffleQueue() {
 	}
 
 	if (!isShuffled) {
-		queueBackup = songQueue;
+		preShuffleQueue = songQueue;
 
 		auto rng = std::default_random_engine {};
 		std::shuffle(songQueue.begin(), songQueue.end(), rng);
@@ -57,8 +57,8 @@ void QueueMaster::shuffleQueue() {
 		listQueue();
 	}
 	else if (isShuffled) {
-		songQueue = queueBackup;
-		queueBackup.erase(queueBackup.begin(), queueBackup.end());
+		songQueue = preShuffleQueue;
+		preShuffleQueue.erase(preShuffleQueue.begin(), preShuffleQueue.end());
 
 		msg("Queue has been unshuffled");
 	}
@@ -151,7 +151,7 @@ void QueueMaster::readFromFile(const fs::path& path) {
 	}
 
 	std::string line;
-	std::vector<fs::path> readQueue;
+	std::vector<fs::path> fileQueue;
 
 	while (std::getline(in, line))
 	{
@@ -170,9 +170,9 @@ void QueueMaster::readFromFile(const fs::path& path) {
 		    songPath = songPath.substr(1, songPath.size() - 2);
         }
 
-		readQueue.push_back(songPath);
+		fileQueue.push_back(songPath);
 	}
-	songQueue = readQueue;
+	songQueue = fileQueue;
 }
 
 bool QueueMaster::playQueueSong(const fs::path& song, AudioMaster& master, const SharedAudioState& sharedState) {

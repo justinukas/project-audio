@@ -17,7 +17,7 @@ private:
     std::vector<fs::path> songQueue;
 
     
-    std::vector<fs::path> queueBackup; // backup after shuffling
+    std::vector<fs::path> preShuffleQueue; // backup after shuffling
     std::atomic<bool> isShuffled = false;
 
     std::atomic<int> currentPosition; // index of current song
