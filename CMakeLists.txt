@@ -39,11 +39,18 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ooptest PROPERTY CXX_STANDARD 20)
 endif()
 
-# TODO: Add tests and install targets if needed.
+find_package(ftxui REQUIRED)
 
-# Linux libraries (Probably remove them if building on Windows)
 target_link_libraries(ooptest
-    dl
-    pthread
-    m
+  # FTXUI library links
+  PRIVATE ftxui::screen
+  PRIVATE ftxui::dom
+  PRIVATE ftxui::component
+
+  # Linux libraries (Probably remove them if building on Windows)
+  dl
+  pthread
+  m
 )
+
+# TODO: Add tests and install targets if needed. (?)
