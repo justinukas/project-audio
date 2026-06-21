@@ -20,8 +20,9 @@ Skipping
 Playing previous track
 Selection of a specific song to play
 
-## Building:<br>
-Build using CMake >=3.10
+## Build requirements:<br>
+CMake >=3.10<br>
+FTXUI installation (system-wide or via package manager)
 
 ## To be added:<br>
 Handle audio device change (plugging in other headphones, speakers, etc.)<br>
